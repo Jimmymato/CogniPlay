@@ -1,0 +1,89 @@
+/* ============================================================
+   CogniPlay — Tokens de diseño
+   Variables de marca, superficies, semáforo, tipografía, radios
+   y sombras. Fuente única de verdad del sistema visual.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/GeistVF.woff') format('woff');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMonoVF.woff') format('woff');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ── Marca ──────────────────────────────────────── */
+  --cp-blue:         #4A8FE7;
+  --cp-blue-dark:    #2F72CE;
+  --cp-blue-light:   #EBF2FF;
+  --cp-blue-mid:     #BDD4F8;
+
+  --cp-purple:       #7B6CD4;
+  --cp-purple-dark:  #5C4FB5;
+  --cp-purple-light: #EEEbFF;
+
+  --cp-teal:         #3CB9AA;
+  --cp-teal-light:   #E3F6F4;
+
+  --cp-warm:         #F5A040;
+  --cp-warm-light:   #FEF3E6;
+
+  /* ── Superficies ────────────────────────────────── */
+  --cp-bg:           #EDF2FA;
+  --cp-bg-child:     #F0EEFF;
+  --cp-surface:      #FFFFFF;
+  --cp-surface-2:    #F5F8FD;
+
+  /* ── Texto ──────────────────────────────────────── */
+  --cp-text-1:       #1B2537;
+  --cp-text-2:       #5A6B80;
+  --cp-text-3:       #96A7BB;
+
+  /* ── Bordes ─────────────────────────────────────── */
+  --cp-border:       #DDE6F4;
+  --cp-border-mid:   #C8D6EC;
+
+  /* ── Estado — semáforo ──────────────────────────── */
+  --cp-green:        #22A867;
+  --cp-green-text:   #14724A;
+  --cp-green-bg:     #E3F8EE;
+  --cp-green-border: #A8E8C8;
+
+  --cp-amber:        #D49A14;
+  --cp-amber-text:   #8F6800;
+  --cp-amber-bg:     #FEF3D6;
+  --cp-amber-border: #F5DFA0;
+
+  --cp-red:          #E04040;
+  --cp-red-text:     #B42020;
+  --cp-red-bg:       #FDECEC;
+  --cp-red-border:   #F5BFBF;
+
+  /* ── Tipografía ─────────────────────────────────── */
+  --cp-font:         'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --cp-font-mono:    'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* ── Radios ─────────────────────────────────────── */
+  --r-xs:   6px;
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-2xl:  24px;
+  --r-pill: 9999px;
+
+  /* ── Sombras ────────────────────────────────────── */
+  --sh-xs:  0 1px 2px rgba(27,37,55,0.05);
+  --sh-sm:  0 1px 4px rgba(27,37,55,0.07), 0 0 0 1px rgba(27,37,55,0.03);
+  --sh-md:  0 4px 14px rgba(27,37,55,0.08), 0 1px 4px rgba(27,37,55,0.04);
+  --sh-lg:  0 8px 28px rgba(27,37,55,0.10), 0 2px 6px rgba(27,37,55,0.04);
+}

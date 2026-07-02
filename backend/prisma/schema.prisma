@@ -1,0 +1,296 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enumeraciones ──────────────────────────────────────────
+
+enum RolUsuario {
+  TERAPEUTA
+  NINO
+}
+
+enum NivelDificultad {
+  FACIL
+  MEDIO
+  DIFICIL
+}
+
+enum NombreFuncionEjecutiva {
+  RAZONAMIENTO
+  FLEXIBILIDAD_COGNITIVA
+  INHIBICION
+  TOMA_DECISIONES
+  ESTIMACION_TEMPORAL
+  EJECUCION_DUAL
+  BRANCHING
+}
+
+enum EstadoSesion {
+  EN_CURSO
+  COMPLETADA
+  ABANDONADA
+}
+
+enum TipoDecision {
+  AUMENTAR_DIFICULTAD
+  MANTENER_DIFICULTAD
+  REDUCIR_DIFICULTAD
+  REPETIR_ACTIVIDAD
+  ASIGNAR_REFUERZO
+  DESBLOQUEAR_SIGUIENTE_NIVEL
+  DESBLOQUEAR_SIGUIENTE_ACTIVIDAD
+  BLOQUEAR_ACTIVIDAD
+  DESBLOQUEAR_ACTIVIDAD
+}
+
+enum EstadoRefuerzo {
+  PENDIENTE
+  EN_PROGRESO
+  COMPLETADO
+}
+
+// ── Modelos ────────────────────────────────────────────────
+
+model Usuario {
+  id             String     @id @default(uuid())
+  correo         String     @unique
+  contrasenaHash String
+  rol            RolUsuario
+  activo         Boolean    @default(true)
+  creadoEn       DateTime   @default(now())
+  actualizadoEn  DateTime   @updatedAt
+
+  terapeuta      Terapeuta?
+  nino           Nino?
+}
+
+model Terapeuta {
+  id            String   @id @default(uuid())
+  usuarioId     String   @unique
+  nombres       String
+  apellidos     String
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  usuario       Usuario        @relation(fields: [usuarioId], references: [id])
+  ninos         Nino[]
+  sesiones      Sesion[]
+  refuerzos     Refuerzo[]
+  notificaciones Notificacion[]
+  observaciones ObservacionTerapeuta[]
+}
+
+model Nino {
+  id              String   @id @default(uuid())
+  usuarioId       String   @unique
+  terapeutaId     String
+  nombres         String
+  apellidos       String
+  fechaNacimiento DateTime @db.Date
+  activo          Boolean  @default(true)
+  creadoEn        DateTime @default(now())
+  actualizadoEn   DateTime @updatedAt
+
+  usuario            Usuario              @relation(fields: [usuarioId], references: [id])
+  terapeuta          Terapeuta            @relation(fields: [terapeutaId], references: [id])
+  sesiones           Sesion[]
+  intentos           Intento[]
+  progresos          ProgresoActividad[]
+  refuerzos          Refuerzo[]
+  decisiones         DecisionProgresion[]
+  notificaciones     Notificacion[]
+  observaciones      ObservacionTerapeuta[]
+}
+
+model FuncionEjecutiva {
+  id          String                 @id @default(uuid())
+  nombre      NombreFuncionEjecutiva @unique
+  etiqueta    String
+  descripcion String
+  color       String
+  orden       Int
+
+  actividades       Actividad[]
+  decisiones        DecisionProgresion[]
+  refuerzos         Refuerzo[]
+  recomendaciones   Recomendacion[]
+  resumenes         ResumenFuncionPorSesion[]
+}
+
+model Actividad {
+  id                  String   @id @default(uuid())
+  funcionEjecutivaId  String
+  nombre              String
+  descripcion         String
+  icono               String
+  ordenDesbloqueo     Int
+  activa              Boolean  @default(true)
+
+  funcionEjecutiva    FuncionEjecutiva     @relation(fields: [funcionEjecutivaId], references: [id])
+  niveles             NivelActividad[]
+  intentos            Intento[]
+  progresos           ProgresoActividad[]
+  decisiones          DecisionProgresion[]
+  refuerzos           Refuerzo[]
+}
+
+model NivelActividad {
+  id            String          @id @default(uuid())
+  actividadId   String
+  nivel         NivelDificultad
+  configuracion Json
+  totalItems    Int
+  puntajeMaximo Int
+
+  actividad     Actividad @relation(fields: [actividadId], references: [id])
+
+  @@unique([actividadId, nivel])
+}
+
+model ProgresoActividad {
+  id                  String          @id @default(uuid())
+  ninoId              String
+  actividadId         String
+  nivelActual         NivelDificultad
+  desbloqueada        Boolean         @default(false)
+  bloqueadaManualmente Boolean        @default(false)
+  nivelSuperado       Boolean         @default(false)
+  creadoEn            DateTime        @default(now())
+  actualizadoEn       DateTime        @updatedAt
+
+  nino        Nino      @relation(fields: [ninoId], references: [id])
+  actividad   Actividad @relation(fields: [actividadId], references: [id])
+
+  @@unique([ninoId, actividadId])
+}
+
+model Sesion {
+  id               String       @id @default(uuid())
+  ninoId           String
+  terapeutaId      String
+  fechaInicio      DateTime
+  fechaFin         DateTime?
+  duracionMinutos  Int?
+  puntajeGlobal    Int?
+  precisionGlobal  Decimal?
+  estado           EstadoSesion
+
+  nino             Nino                      @relation(fields: [ninoId], references: [id])
+  terapeuta        Terapeuta                 @relation(fields: [terapeutaId], references: [id])
+  intentos         Intento[]
+  recomendaciones  Recomendacion[]
+  resumenes        ResumenFuncionPorSesion[]
+}
+
+model Intento {
+  id                   String          @id @default(uuid())
+  sesionId             String?
+  ninoId               String
+  actividadId          String
+  nivel                NivelDificultad
+  respuestasCorrectas  Int
+  respuestasIncorrectas Int
+  omisiones            Int
+  totalItems           Int
+  precision            Decimal
+  tiempoSegundos       Int
+  puntaje              Int
+  completado           Boolean
+  creadoEn             DateTime        @default(now())
+
+  sesion    Sesion?            @relation(fields: [sesionId], references: [id])
+  nino      Nino               @relation(fields: [ninoId], references: [id])
+  actividad Actividad          @relation(fields: [actividadId], references: [id])
+  decision  DecisionProgresion?
+}
+
+model DecisionProgresion {
+  id                 String           @id @default(uuid())
+  intentoId          String?          @unique
+  ninoId             String
+  actividadId        String
+  funcionEjecutivaId String
+  decision           TipoDecision
+  nivelAnterior      NivelDificultad?
+  nivelNuevo         NivelDificultad?
+  precisionEvaluada  Decimal
+  razon              String
+  automatica         Boolean
+  creadoEn           DateTime         @default(now())
+
+  intento          Intento?         @relation(fields: [intentoId], references: [id])
+  nino             Nino             @relation(fields: [ninoId], references: [id])
+  actividad        Actividad        @relation(fields: [actividadId], references: [id])
+  funcionEjecutiva FuncionEjecutiva @relation(fields: [funcionEjecutivaId], references: [id])
+}
+
+model Refuerzo {
+  id                      String         @id @default(uuid())
+  ninoId                  String
+  funcionEjecutivaId      String
+  actividadId             String?
+  motivo                  String
+  estado                  EstadoRefuerzo
+  asignadoPorTerapeutaId  String?
+  creadoEn                DateTime       @default(now())
+  actualizadoEn           DateTime       @updatedAt
+
+  nino             Nino              @relation(fields: [ninoId], references: [id])
+  funcionEjecutiva FuncionEjecutiva  @relation(fields: [funcionEjecutivaId], references: [id])
+  actividad        Actividad?        @relation(fields: [actividadId], references: [id])
+  asignadoPor      Terapeuta?        @relation(fields: [asignadoPorTerapeutaId], references: [id])
+}
+
+model Recomendacion {
+  id                 String   @id @default(uuid())
+  sesionId           String
+  funcionEjecutivaId String
+  texto              String
+  creadoEn           DateTime @default(now())
+
+  sesion           Sesion           @relation(fields: [sesionId], references: [id])
+  funcionEjecutiva FuncionEjecutiva @relation(fields: [funcionEjecutivaId], references: [id])
+}
+
+model Notificacion {
+  id          String   @id @default(uuid())
+  terapeutaId String
+  ninoId      String
+  tipo        String
+  mensaje     String
+  leida       Boolean  @default(false)
+  creadoEn    DateTime @default(now())
+
+  terapeuta Terapeuta @relation(fields: [terapeutaId], references: [id])
+  nino      Nino      @relation(fields: [ninoId], references: [id])
+}
+
+model ObservacionTerapeuta {
+  id            String   @id @default(uuid())
+  ninoId        String
+  terapeutaId   String
+  texto         String
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  nino      Nino      @relation(fields: [ninoId], references: [id])
+  terapeuta Terapeuta @relation(fields: [terapeutaId], references: [id])
+}
+
+model ResumenFuncionPorSesion {
+  id                 String   @id @default(uuid())
+  sesionId           String
+  funcionEjecutivaId String
+  precision          Decimal
+  intentosContados   Int
+  creadoEn           DateTime @default(now())
+
+  sesion           Sesion           @relation(fields: [sesionId], references: [id])
+  funcionEjecutiva FuncionEjecutiva @relation(fields: [funcionEjecutivaId], references: [id])
+
+  @@unique([sesionId, funcionEjecutivaId])
+}
