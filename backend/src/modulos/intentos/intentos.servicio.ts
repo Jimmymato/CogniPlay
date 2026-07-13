@@ -1,6 +1,7 @@
 import type { NivelDificultad } from '@prisma/client'
 import { prisma } from '../../config/prisma'
 import { conflicto, noEncontrado, solicitudInvalida } from '../../utiles/errores'
+import { fechaDeFiltro, filtroCreadoEn } from '../../utiles/fechas'
 import { obtenerNinoId, obtenerTerapeutaId } from '../../utiles/perfiles'
 import type { CargaToken } from '../../utiles/jwt'
 import { aplicarProgresion } from '../progreso/progreso.servicio'
@@ -129,16 +130,6 @@ interface FiltrosIntentos {
   hasta?: string
 }
 
-/** Convierte un filtro de fecha ISO en Date, validando el formato. */
-function fechaDeFiltro(valor: string | undefined, campo: string): Date | undefined {
-  if (!valor) return undefined
-  const fecha = new Date(valor)
-  if (Number.isNaN(fecha.getTime())) {
-    throw solicitudInvalida(`Fecha inválida en el parámetro "${campo}"`)
-  }
-  return fecha
-}
-
 export async function listarIntentos(usuario: CargaToken, filtros: FiltrosIntentos) {
   let ninoId: string
 
@@ -165,14 +156,7 @@ export async function listarIntentos(usuario: CargaToken, filtros: FiltrosIntent
       ninoId,
       ...(filtros.sesionId ? { sesionId: filtros.sesionId } : {}),
       ...(filtros.actividadId ? { actividadId: filtros.actividadId } : {}),
-      ...(desde || hasta
-        ? {
-            creadoEn: {
-              ...(desde ? { gte: desde } : {}),
-              ...(hasta ? { lte: hasta } : {}),
-            },
-          }
-        : {}),
+      ...filtroCreadoEn(desde, hasta),
     },
     orderBy: { creadoEn: 'desc' },
     include: {

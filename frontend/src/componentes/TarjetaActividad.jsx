@@ -3,30 +3,20 @@ import { Lock } from 'lucide-react'
 import InsigniaPrecision from './InsigniaPrecision'
 import IconoActividad from './IconoActividad'
 
-// Nombres legibles de los niveles de dificultad.
-const ETIQUETA_NIVEL = {
-  FACIL: 'Fácil',
-  MEDIO: 'Medio',
-  DIFICIL: 'Difícil',
-}
-
 // Tarjeta de una actividad que el niño puede jugar. Es un botón real para que
-// funcione con teclado y lectores de pantalla; el color proviene de su función.
+// funcione con teclado y lectores de pantalla; el color y la etiqueta de su
+// función ejecutiva la identifican dentro de la grilla única del tablero.
 // Si el terapeuta la bloqueó, se muestra con candado y no es jugable.
 export default function TarjetaActividad({
   actividad,
   colorFuncion,
+  etiquetaFuncion,
   ultimoIntento,
   bloqueada = false,
   onJugar,
 }) {
   const [resaltada, setResaltada] = useState(false)
   const [enfocada, setEnfocada] = useState(false)
-
-  const niveles = [...(actividad.niveles ?? [])].sort((a, b) => {
-    const orden = ['FACIL', 'MEDIO', 'DIFICIL']
-    return orden.indexOf(a.nivel) - orden.indexOf(b.nivel)
-  })
 
   return (
     <button
@@ -47,12 +37,15 @@ export default function TarjetaActividad({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        gap: 10,
+        gap: 14,
         width: '100%',
         textAlign: 'left',
-        padding: 16,
+        padding: 20,
         background: 'var(--cp-surface)',
-        border: `1px solid ${enfocada && !bloqueada ? colorFuncion : 'var(--cp-border)'}`,
+        borderLeft: `1px solid ${enfocada && !bloqueada ? colorFuncion : 'var(--cp-border)'}`,
+        borderRight: `1px solid ${enfocada && !bloqueada ? colorFuncion : 'var(--cp-border)'}`,
+        borderBottom: `1px solid ${enfocada && !bloqueada ? colorFuncion : 'var(--cp-border)'}`,
+        borderTop: `4px solid ${colorFuncion}`,
         borderRadius: 'var(--r-lg)',
         boxShadow: (resaltada || enfocada) && !bloqueada ? 'var(--sh-md)' : 'var(--sh-sm)',
         outline: enfocada && !bloqueada ? `2px solid ${colorFuncion}` : 'none',
@@ -64,26 +57,56 @@ export default function TarjetaActividad({
         fontFamily: 'var(--cp-font)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+      {/* Chip de la función ejecutiva a la que pertenece la actividad. */}
+      {etiquetaFuncion && (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            fontWeight: 700,
+            color: colorFuncion,
+            background: `color-mix(in srgb, ${colorFuncion} 10%, white)`,
+            border: `1px solid color-mix(in srgb, ${colorFuncion} 30%, white)`,
+            borderRadius: 'var(--r-pill)',
+            padding: '4px 11px',
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              background: colorFuncion,
+              flexShrink: 0,
+            }}
+          />
+          {etiquetaFuncion}
+        </span>
+      )}
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%' }}>
         <span
           aria-hidden="true"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 46,
-            height: 46,
+            width: 56,
+            height: 56,
             borderRadius: 'var(--r-md)',
             background: `color-mix(in srgb, ${colorFuncion} 14%, white)`,
             flexShrink: 0,
           }}
         >
-          <IconoActividad nombre={actividad.icono} size={24} color={colorFuncion} />
+          <IconoActividad nombre={actividad.icono} size={30} color={colorFuncion} />
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 15,
+              fontSize: 17,
               fontWeight: 700,
               color: 'var(--cp-text-1)',
               letterSpacing: '-0.01em',
@@ -91,39 +114,23 @@ export default function TarjetaActividad({
           >
             {actividad.nombre}
           </div>
-          <div style={{ fontSize: 12.5, color: 'var(--cp-text-2)', marginTop: 2 }}>
+          <div style={{ fontSize: 13.5, color: 'var(--cp-text-2)', marginTop: 3, lineHeight: 1.4 }}>
             {actividad.descripcion}
           </div>
         </div>
         {bloqueada ? (
-          <Lock size={20} color="var(--cp-text-3)" aria-hidden="true" />
+          <Lock size={22} color="var(--cp-text-3)" aria-hidden="true" />
         ) : (
           ultimoIntento && <InsigniaPrecision precision={ultimoIntento.precision} />
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-        {niveles.map((n) => (
-          <span
-            key={n.id}
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: 'var(--cp-text-2)',
-              background: 'var(--cp-surface-2)',
-              border: '1px solid var(--cp-border)',
-              borderRadius: 'var(--r-pill)',
-              padding: '3px 9px',
-            }}
-          >
-            {ETIQUETA_NIVEL[n.nivel] ?? n.nivel}
-          </span>
-        ))}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', width: '100%' }}>
         {bloqueada ? (
           <span
             style={{
               marginLeft: 'auto',
-              fontSize: 12.5,
+              fontSize: 13.5,
               fontWeight: 600,
               color: 'var(--cp-text-3)',
             }}
@@ -134,20 +141,20 @@ export default function TarjetaActividad({
           <span
             style={{
               marginLeft: 'auto',
-              fontSize: 12.5,
-              fontWeight: 600,
+              fontSize: 14,
+              fontWeight: 700,
               color: colorFuncion,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 4,
+              gap: 5,
             }}
           >
             Jugar
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path
                 d="M4 3l4 4-4 4"
                 stroke={colorFuncion}
-                strokeWidth="1.6"
+                strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />

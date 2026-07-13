@@ -1,16 +1,24 @@
-# React + Vite
+# CogniPlay — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicación web de CogniPlay construida con React 19 + Vite 8 (JSX), React Router, Axios y Recharts.
 
-Currently, two official plugins are available:
+La documentación completa del proyecto (instalación, variables de entorno, estructura y comandos) está en el [README de la raíz](../README.md).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Inicio rápido
 
-## React Compiler
+```bash
+npm install
+cp .env.example .env   # VITE_API_URL=http://localhost:4000/api
+npm run dev            # http://localhost:5173
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Requiere el backend corriendo en el puerto 4000 (ver `../backend`).
 
-## Expanding the Oxlint configuration
+## Comandos
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run preview` | Sirve el build generado |
+| `npm run lint` | Linter (oxlint) |

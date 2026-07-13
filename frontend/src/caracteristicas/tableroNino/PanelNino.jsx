@@ -31,8 +31,9 @@ function saludoPorHora() {
   return 'Buenas noches'
 }
 
-// Panel de inicio del niño: muestra las actividades que puede jugar, agrupadas
-// por función ejecutiva, con su última precisión cuando ya las ha practicado.
+// Panel de inicio del niño: una grilla única de actividades, cada tarjeta con
+// el color y la etiqueta de su función ejecutiva, con la última precisión
+// cuando ya la ha practicado.
 export default function PanelNino() {
   const { usuario } = useAuth()
   const navegar = useNavigate()
@@ -82,8 +83,14 @@ export default function PanelNino() {
     [progreso],
   )
 
-  // Solo se muestran las funciones que tienen al menos una actividad jugable.
-  const funcionesConActividades = funciones.filter((f) => (f.actividades?.length ?? 0) > 0)
+  // Lista plana de actividades con su función, en el orden del catálogo.
+  const actividades = useMemo(
+    () =>
+      funciones.flatMap((funcion) =>
+        (funcion.actividades ?? []).map((actividad) => ({ actividad, funcion })),
+      ),
+    [funciones],
+  )
 
   function jugar(actividad) {
     navegar(rutaActividadNino(actividad.id))
@@ -92,23 +99,29 @@ export default function PanelNino() {
   return (
     <div style={{ minHeight: '100%', background: 'var(--cp-bg-child)' }}>
       <BarraSuperior />
-      <main style={{ padding: '24px 20px 36px', maxWidth: 760, margin: '0 auto' }}>
-        <header style={{ marginBottom: 22 }}>
+      <main
+        style={{
+          padding: 'clamp(20px, 3vw, 32px) clamp(16px, 4vw, 40px) 48px',
+          maxWidth: 1120,
+          margin: '0 auto',
+        }}
+      >
+        <header style={{ marginBottom: 24 }}>
           <h1
             style={{
-              fontSize: 24,
+              fontSize: 'clamp(24px, 4vw, 30px)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               marginBottom: 4,
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 10,
             }}
           >
             {saludoPorHora()}, {nombre}
-            <Hand size={22} color="var(--cp-warm)" aria-hidden="true" />
+            <Hand size={26} color="var(--cp-warm)" aria-hidden="true" />
           </h1>
-          <p style={{ color: 'var(--cp-text-2)', fontSize: 14 }}>
+          <p style={{ color: 'var(--cp-text-2)', fontSize: 'clamp(14px, 2.2vw, 16px)' }}>
             Elige una actividad para empezar a jugar.
           </p>
         </header>
@@ -123,7 +136,7 @@ export default function PanelNino() {
           />
         )}
 
-        {!cargando && !error && funcionesConActividades.length === 0 && (
+        {!cargando && !error && actividades.length === 0 && (
           <EstadoVacio
             icono={Inbox}
             titulo="Todavía no hay actividades"
@@ -131,44 +144,24 @@ export default function PanelNino() {
           />
         )}
 
-        {!cargando && !error && funcionesConActividades.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
-            {funcionesConActividades.map((funcion) => (
-              <section key={funcion.id}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: '50%',
-                      background: funcion.color,
-                      flexShrink: 0,
-                    }}
-                  />
-                  <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--cp-text-1)' }}>
-                    {funcion.etiqueta}
-                  </h2>
-                </div>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: 12,
-                  }}
-                >
-                  {funcion.actividades.map((actividad) => (
-                    <TarjetaActividad
-                      key={actividad.id}
-                      actividad={actividad}
-                      colorFuncion={funcion.color}
-                      ultimoIntento={ultimoPorActividad.get(actividad.id)}
-                      bloqueada={bloqueadas.has(actividad.id)}
-                      onJugar={jugar}
-                    />
-                  ))}
-                </div>
-              </section>
+        {!cargando && !error && actividades.length > 0 && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(310px, 100%), 1fr))',
+              gap: 16,
+            }}
+          >
+            {actividades.map(({ actividad, funcion }) => (
+              <TarjetaActividad
+                key={actividad.id}
+                actividad={actividad}
+                colorFuncion={funcion.color}
+                etiquetaFuncion={funcion.etiqueta}
+                ultimoIntento={ultimoPorActividad.get(actividad.id)}
+                bloqueada={bloqueadas.has(actividad.id)}
+                onJugar={jugar}
+              />
             ))}
           </div>
         )}

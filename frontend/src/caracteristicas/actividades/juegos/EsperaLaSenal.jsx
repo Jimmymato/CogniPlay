@@ -1,23 +1,36 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, X, Minus } from 'lucide-react'
+import { Check, X, Hand, Hourglass } from 'lucide-react'
 import CabeceraJuego from '../componentes/CabeceraJuego'
+import { estiloJuegoRaiz, estiloZonaJuego, estiloInstruccion, estiloPista } from './estilosJuego'
 
-// Juego de inhibición (go / no-go): el niño debe tocar SOLO cuando aparece el
-// círculo verde y contenerse cuando aparece el rojo. Cada ítem es un ensayo con
-// una ventana de tiempo; si no responde, se resuelve solo.
-//  - verde tocado  → acierto
+const VERDE = '#22A867'
+const ROJO = '#E04040'
+// El botón de tocar es azul neutro a propósito: no debe confundirse con las
+// señales verde (tocar) y roja (esperar).
+const AZUL_BOTON = 'var(--cp-blue)'
+
+// Duración de la ventana de respuesta según la dificultad elegida.
+const VENTANA_MS = { FACIL: 2600, MEDIO: 2000, DIFICIL: 1500 }
+const PREPARACION_MS = 850
+const FEEDBACK_MS = 800
+
+// Juego de inhibición (go / no-go). Cada ensayo tiene tres momentos bien
+// separados: preparación (círculo gris, "Atento…"), señal (círculo verde =
+// tocar, octágono rojo = esperar) y retroalimentación. El niño responde
+// siempre con el mismo botón grande, que es independiente del estímulo.
+//  - verde tocado    → acierto
 //  - verde sin tocar → omisión
-//  - rojo tocado   → error (no se contuvo)
-//  - rojo sin tocar → acierto (se contuvo)
-export default function EsperaLaSenal({ configuracion, color, onTerminar }) {
+//  - rojo tocado     → error (no se contuvo)
+//  - rojo sin tocar  → acierto (se contuvo)
+export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar }) {
   const { items, pistas } = configuracion
-  const ventanaMs = pistas ? 1900 : 1300
+  const ventanaMs = VENTANA_MS[nivel] ?? VENTANA_MS.MEDIO
 
   // Secuencia fija de ensayos para toda la partida (~65 % "toca", 35 % "espera").
   const tipos = useRef(Array.from({ length: items }, () => (Math.random() < 0.65 ? 'go' : 'nogo')))
 
   const [indice, setIndice] = useState(0)
-  const [fase, setFase] = useState('senal') // 'senal' | 'feedback'
+  const [fase, setFase] = useState('preparacion') // 'preparacion' | 'senal' | 'feedback'
   const [resultado, setResultado] = useState(null) // 'acierto' | 'error' | 'omision'
 
   const aciertosRef = useRef(0)
@@ -28,7 +41,12 @@ export default function EsperaLaSenal({ configuracion, color, onTerminar }) {
   const inicioRef = useRef(Date.now())
   const ventanaRef = useRef(null)
 
-  useEffect(() => () => { montadoRef.current = false }, [])
+  // El cuerpo vuelve a marcar "montado" porque StrictMode monta, desmonta y
+  // remonta el componente en desarrollo; solo limpiar dejaría el ref en false.
+  useEffect(() => {
+    montadoRef.current = true
+    return () => { montadoRef.current = false }
+  }, [])
 
   function finalizar() {
     if (finalizadoRef.current) return
@@ -55,15 +73,24 @@ export default function EsperaLaSenal({ configuracion, color, onTerminar }) {
       if (indice + 1 >= items) {
         finalizar()
       } else {
-        setFase('senal')
+        setFase('preparacion')
         setIndice((i) => i + 1)
       }
-    }, 650)
+    }, FEEDBACK_MS)
   }
 
-  // Inicia cada ensayo y programa su resolución automática al vencer la ventana.
+  // Momento de preparación: pausa neutral antes de mostrar cada señal.
   useEffect(() => {
-    if (finalizadoRef.current) return undefined
+    if (finalizadoRef.current || fase !== 'preparacion') return undefined
+    const id = setTimeout(() => {
+      if (montadoRef.current) setFase('senal')
+    }, PREPARACION_MS)
+    return () => clearTimeout(id)
+  }, [fase, indice])
+
+  // Ventana de respuesta: si el niño no responde, el ensayo se resuelve solo.
+  useEffect(() => {
+    if (finalizadoRef.current || fase !== 'senal') return undefined
     respondidoRef.current = false
     const tipo = tipos.current[indice]
     ventanaRef.current = setTimeout(() => {
@@ -73,7 +100,7 @@ export default function EsperaLaSenal({ configuracion, color, onTerminar }) {
     }, ventanaMs)
     return () => clearTimeout(ventanaRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indice])
+  }, [fase, indice])
 
   function tocar() {
     if (fase !== 'senal' || respondidoRef.current) return
@@ -83,33 +110,16 @@ export default function EsperaLaSenal({ configuracion, color, onTerminar }) {
   }
 
   const tipo = tipos.current[indice]
-  const enFeedback = fase === 'feedback'
-  const verde = '#22A867'
-  const rojo = '#E04040'
-  const fondoSenal = enFeedback
-    ? resultado === 'error'
-      ? rojo
-      : verde
-    : tipo === 'go'
-      ? verde
-      : rojo
+  const botonActivo = fase === 'senal'
 
-  const contenidoSenal = enFeedback ? (
-    resultado === 'acierto' ? (
-      <Check size={64} strokeWidth={3} aria-hidden="true" />
-    ) : resultado === 'error' ? (
-      <X size={64} strokeWidth={3} aria-hidden="true" />
-    ) : (
-      <Minus size={64} strokeWidth={3} aria-hidden="true" />
-    )
-  ) : tipo === 'go' ? (
-    '¡Toca!'
-  ) : (
-    'Espera'
-  )
+  const MENSAJE_FEEDBACK = {
+    acierto: { icono: Check, color: VERDE, texto: '¡Muy bien!' },
+    error: { icono: X, color: ROJO, texto: 'Era roja: había que esperar.' },
+    omision: { icono: Hourglass, color: 'var(--cp-amber)', texto: 'Era verde: había que tocar.' },
+  }
 
   return (
-    <div>
+    <div style={estiloJuegoRaiz}>
       <CabeceraJuego
         titulo="Espera la Señal"
         color={color}
@@ -119,43 +129,135 @@ export default function EsperaLaSenal({ configuracion, color, onTerminar }) {
         segundosTotales={0}
       />
 
-      <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--cp-text-2)', marginBottom: 18 }}>
-        Toca <strong>solo</strong> cuando veas el círculo <strong style={{ color: verde }}>verde</strong>.
-      </p>
+      <div style={estiloZonaJuego}>
+        <p style={estiloInstruccion}>
+          Toca el botón <strong>solo</strong> cuando la señal sea{' '}
+          <strong style={{ color: VERDE }}>verde</strong>. Si es{' '}
+          <strong style={{ color: ROJO }}>roja</strong>, ¡quédate quieto!
+        </p>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-        <button
-          type="button"
-          onClick={tocar}
-          disabled={enFeedback}
-          aria-label="Tocar la señal"
+        {/* Zona del estímulo, con altura fija para que nada salte de lugar. */}
+        <div
           style={{
-            width: 180,
-            height: 180,
-            borderRadius: '50%',
-            border: 'none',
-            background: fondoSenal,
-            color: 'white',
-            fontSize: 22,
-            fontWeight: 700,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            fontFamily: 'var(--cp-font)',
-            cursor: enFeedback ? 'default' : 'pointer',
-            boxShadow: 'var(--sh-md)',
-            transition: 'background 0.2s ease',
+            height: 'clamp(180px, 30vh, 230px)',
+            marginBottom: 20,
           }}
+          aria-live="polite"
         >
-          {contenidoSenal}
-        </button>
-      </div>
+          {fase === 'preparacion' && (
+            <div
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: '50%',
+                background: 'var(--cp-surface-2)',
+                border: '3px dashed var(--cp-border-mid)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 18,
+                fontWeight: 700,
+                color: 'var(--cp-text-3)',
+                fontFamily: 'var(--cp-font)',
+              }}
+            >
+              Atento…
+            </div>
+          )}
 
-      {pistas && !enFeedback && (
-        <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--cp-text-3)' }}>
-          Verde = tocar · Rojo = no tocar
-        </p>
-      )}
+          {fase === 'senal' && tipo === 'go' && (
+            <div
+              style={{
+                width: 160,
+                height: 160,
+                borderRadius: '50%',
+                background: VERDE,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                color: 'white',
+                boxShadow: 'var(--sh-md)',
+              }}
+            >
+              <Check size={62} strokeWidth={3} aria-hidden="true" />
+              <span style={{ fontSize: 18, fontWeight: 700 }}>¡Verde!</span>
+            </div>
+          )}
+
+          {fase === 'senal' && tipo === 'nogo' && (
+            <div
+              style={{
+                width: 165,
+                height: 165,
+                background: ROJO,
+                clipPath:
+                  'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                color: 'white',
+              }}
+            >
+              <Hand size={56} strokeWidth={2.2} aria-hidden="true" />
+              <span style={{ fontSize: 18, fontWeight: 700 }}>¡Alto!</span>
+            </div>
+          )}
+
+          {fase === 'feedback' && resultado && (() => {
+            const m = MENSAJE_FEEDBACK[resultado]
+            const Icono = m.icono
+            return (
+              <div style={{ textAlign: 'center' }}>
+                <Icono size={64} strokeWidth={2.4} color={m.color} aria-hidden="true" />
+                <p style={{ fontSize: 17, fontWeight: 700, color: 'var(--cp-text-1)', marginTop: 6 }}>
+                  {m.texto}
+                </p>
+              </div>
+            )
+          })()}
+        </div>
+
+        {/* Botón de respuesta fijo, independiente del estímulo. */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+          <button
+            type="button"
+            onClick={tocar}
+            disabled={!botonActivo}
+            aria-label="Tocar"
+            style={{
+              minWidth: 'min(280px, 80%)',
+              minHeight: 70,
+              borderRadius: 'var(--r-pill)',
+              border: 'none',
+              background: AZUL_BOTON,
+              color: 'white',
+              fontSize: 22,
+              fontWeight: 700,
+              fontFamily: 'var(--cp-font)',
+              cursor: botonActivo ? 'pointer' : 'default',
+              opacity: botonActivo ? 1 : 0.5,
+              boxShadow: 'var(--sh-md)',
+              transition: 'opacity 0.15s ease',
+            }}
+          >
+            ¡TOCAR!
+          </button>
+        </div>
+
+        {pistas && (
+          <p style={estiloPista}>
+            Círculo verde = tocar rápido · Señal roja de alto = no tocar
+          </p>
+        )}
+      </div>
     </div>
   )
 }

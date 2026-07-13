@@ -2,6 +2,13 @@ import { useMemo, useState } from 'react'
 import CabeceraJuego from '../componentes/CabeceraJuego'
 import { useJuegoRondas } from './useJuegoRondas'
 import { entero, barajar } from './aleatorio'
+import {
+  estiloJuegoRaiz,
+  estiloZonaJuego,
+  estiloInstruccion,
+  estiloPista,
+  estiloOpcion,
+} from './estilosJuego'
 
 // Crea una ronda: una secuencia aritmética visible con el último término oculto
 // y cuatro opciones (la correcta y tres distractores cercanos).
@@ -47,8 +54,19 @@ export default function SecuenciasLogicas({ configuracion, color, onTerminar }) 
     return null
   }
 
+  const celda = {
+    minWidth: 'clamp(54px, 8vw, 68px)',
+    height: 'clamp(54px, 8vw, 68px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 'clamp(22px, 3.4vw, 28px)',
+    fontWeight: 700,
+    borderRadius: 'var(--r-md)',
+  }
+
   return (
-    <div>
+    <div style={estiloJuegoRaiz}>
       <CabeceraJuego
         titulo="Secuencias Lógicas"
         color={color}
@@ -58,112 +76,77 @@ export default function SecuenciasLogicas({ configuracion, color, onTerminar }) 
         segundosTotales={tiempoLimiteSegundos}
       />
 
-      <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--cp-text-2)', marginBottom: 14 }}>
-        ¿Qué número sigue en la secuencia?
-      </p>
+      <div style={estiloZonaJuego}>
+        <p style={estiloInstruccion}>¿Qué número sigue en la secuencia?</p>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 10,
-          marginBottom: 8,
-        }}
-      >
-        {ronda.visibles.map((n, i) => (
-          <span
-            key={i}
-            style={{
-              minWidth: 52,
-              height: 52,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 22,
-              fontWeight: 700,
-              color: 'var(--cp-text-1)',
-              background: 'var(--cp-surface)',
-              border: '1px solid var(--cp-border)',
-              borderRadius: 'var(--r-md)',
-            }}
-          >
-            {n}
-          </span>
-        ))}
-        <span
+        <div
           style={{
-            minWidth: 52,
-            height: 52,
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 24,
-            fontWeight: 700,
-            color,
-            background: `color-mix(in srgb, ${color} 12%, white)`,
-            border: `2px dashed ${color}`,
-            borderRadius: 'var(--r-md)',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 'clamp(8px, 1.5vw, 14px)',
+            marginBottom: 10,
           }}
         >
-          ?
-        </span>
-      </div>
+          {ronda.visibles.map((n, i) => (
+            <span
+              key={i}
+              style={{
+                ...celda,
+                color: 'var(--cp-text-1)',
+                background: 'var(--cp-surface)',
+                border: '1px solid var(--cp-border)',
+              }}
+            >
+              {n}
+            </span>
+          ))}
+          <span
+            style={{
+              ...celda,
+              color,
+              background: `color-mix(in srgb, ${color} 12%, white)`,
+              border: `2px dashed ${color}`,
+            }}
+          >
+            ?
+          </span>
+        </div>
 
-      {pistas && (
-        <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--cp-text-3)', marginBottom: 14 }}>
-          Pista: cada número aumenta de {ronda.paso} en {ronda.paso}.
-        </p>
-      )}
+        {pistas && (
+          <p style={estiloPista}>
+            Pista: cada número aumenta de {ronda.paso} en {ronda.paso}.
+          </p>
+        )}
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 10,
-          marginTop: 8,
-          maxWidth: 360,
-          marginInline: 'auto',
-        }}
-      >
-        {ronda.opciones.map((opcion) => {
-          const estado = estadoOpcion(opcion)
-          const fondo =
-            estado === 'correcta'
-              ? 'var(--cp-green-bg)'
-              : estado === 'incorrecta'
-                ? 'var(--cp-red-bg)'
-                : 'var(--cp-surface)'
-          const borde =
-            estado === 'correcta'
-              ? 'var(--cp-green-border)'
-              : estado === 'incorrecta'
-                ? 'var(--cp-red-border)'
-                : 'var(--cp-border)'
-          return (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 14,
+            marginTop: 10,
+            width: '100%',
+            maxWidth: 460,
+            marginInline: 'auto',
+          }}
+        >
+          {ronda.opciones.map((opcion) => (
             <button
               key={opcion}
               type="button"
               onClick={() => responder(opcion)}
               disabled={bloqueado}
-              style={{
-                padding: '16px 0',
-                fontSize: 22,
+              style={estiloOpcion(estadoOpcion(opcion), bloqueado, {
+                fontSize: 24,
                 fontWeight: 700,
                 color: 'var(--cp-text-1)',
-                background: fondo,
-                border: `1.5px solid ${borde}`,
-                borderRadius: 'var(--r-md)',
-                cursor: bloqueado ? 'default' : 'pointer',
-                fontFamily: 'var(--cp-font)',
-                transition: 'background 0.2s ease, border-color 0.2s ease',
-              }}
+              })}
             >
               {opcion}
             </button>
-          )
-        })}
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -11,10 +11,15 @@ import {
   Cat,
   Flower2,
   ArrowDown,
-  Hand,
 } from 'lucide-react'
 import CabeceraJuego from '../componentes/CabeceraJuego'
-import { entero, barajar } from './aleatorio'
+import { entero, barajar, elementoAleatorio } from './aleatorio'
+import {
+  estiloJuegoRaiz,
+  estiloZonaJuego,
+  estiloInstruccion,
+  estiloBotonPrincipal,
+} from './estilosJuego'
 
 // Estímulos del juego: objetos reconocibles dibujados como íconos, cada uno
 // con un color propio para que se distingan también por color.
@@ -31,24 +36,42 @@ const ICONOS = [
   { id: 'flor', Icono: Flower2, color: '#3E9668' },
 ]
 
-// Juego de "branching": el niño ve una tarea (una secuencia con la posición en la
-// que va), sufre una breve interrupción y luego debe recordar cuál seguía. Cada
-// ítem tiene tres fases: ver → interrupción → responder.
-function crearRondas(items) {
+// La dificultad cambia la longitud de la secuencia a recordar, la cantidad de
+// globos de la interrupción y si aparece un distractor entre las opciones.
+const LONGITUD_SECUENCIA = { FACIL: 3, MEDIO: 4, DIFICIL: 5 }
+const CANTIDAD_GLOBOS = { FACIL: 2, MEDIO: 3, DIFICIL: 4 }
+const COLORES_GLOBO = ['#4A8FE7', '#3E9668', '#D49A14', '#B25580', '#8763BD']
+
+// Juego de "branching": el niño ve una tarea (una secuencia con la posición en
+// la que va), sufre una interrupción ACTIVA (reventar globos, que genera
+// interferencia real) y luego debe recordar cuál seguía. Las opciones se
+// muestran barajadas para que no se pueda responder por posición.
+function crearRondas(items, nivel) {
+  const longitud = LONGITUD_SECUENCIA[nivel] ?? 4
   return Array.from({ length: items }, () => {
-    const secuencia = barajar(ICONOS).slice(0, 4)
-    const posicion = entero(0, 2) // siempre queda un "siguiente"
-    return { secuencia, posicion, siguiente: secuencia[posicion + 1] }
+    const secuencia = barajar(ICONOS).slice(0, longitud)
+    const posicion = entero(0, longitud - 2) // siempre queda un "siguiente"
+    const siguiente = secuencia[posicion + 1]
+
+    // En Difícil se suma un objeto que NO estaba en la secuencia.
+    const fueraDeSecuencia = ICONOS.filter((i) => !secuencia.includes(i))
+    const opciones = barajar(
+      nivel === 'DIFICIL' ? [...secuencia, elementoAleatorio(fueraDeSecuencia)] : [...secuencia],
+    )
+
+    return { secuencia, posicion, siguiente, opciones }
   })
 }
 
-export default function RetomaLaTarea({ configuracion, color, onTerminar }) {
+export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar }) {
   const { items } = configuracion
-  const rondas = useMemo(() => crearRondas(items), [items])
+  const rondas = useMemo(() => crearRondas(items, nivel), [items, nivel])
+  const totalGlobos = CANTIDAD_GLOBOS[nivel] ?? 3
 
   const [indice, setIndice] = useState(0)
   const [fase, setFase] = useState('ver') // 'ver' | 'interrupcion' | 'responder'
   const [elegido, setElegido] = useState(null)
+  const [globosReventados, setGlobosReventados] = useState([])
 
   const aciertosRef = useRef(0)
   const erroresRef = useRef(0)
@@ -70,6 +93,21 @@ export default function RetomaLaTarea({ configuracion, color, onTerminar }) {
     })
   }
 
+  function empezarInterrupcion() {
+    setGlobosReventados([])
+    setFase('interrupcion')
+  }
+
+  function reventarGlobo(posicionGlobo) {
+    if (globosReventados.includes(posicionGlobo)) return
+    const reventados = [...globosReventados, posicionGlobo]
+    setGlobosReventados(reventados)
+    if (reventados.length >= totalGlobos) {
+      // Pequeña pausa para ver el último globo reventar antes de volver.
+      setTimeout(() => setFase('responder'), 400)
+    }
+  }
+
   function responder(icono) {
     if (fase !== 'responder' || elegido !== null) return
     setElegido(icono)
@@ -89,12 +127,11 @@ export default function RetomaLaTarea({ configuracion, color, onTerminar }) {
 
   function estiloCelda(extra) {
     return {
-      width: 56,
-      height: 56,
+      width: 'clamp(58px, 9vw, 72px)',
+      height: 'clamp(58px, 9vw, 72px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: 28,
       background: 'var(--cp-surface)',
       border: '1px solid var(--cp-border)',
       borderRadius: 'var(--r-md)',
@@ -103,7 +140,7 @@ export default function RetomaLaTarea({ configuracion, color, onTerminar }) {
   }
 
   return (
-    <div>
+    <div style={estiloJuegoRaiz}>
       <CabeceraJuego
         titulo="Retoma la Tarea"
         color={color}
@@ -113,121 +150,167 @@ export default function RetomaLaTarea({ configuracion, color, onTerminar }) {
         segundosTotales={0}
       />
 
-      {/* Fase 1: ver la posición actual */}
-      {fase === 'ver' && (
-        <div style={{ textAlign: 'center' }}>
-          <p
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 5,
-              fontSize: 14,
-              color: 'var(--cp-text-2)',
-              marginBottom: 14,
-            }}
-          >
-            Mira bien: vas por aquí
-            <ArrowDown size={15} aria-hidden="true" />
-            ¿cuál sigue?
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
-            {ronda.secuencia.map((icono, i) => (
-              <div
-                key={i}
-                style={estiloCelda(
-                  i === ronda.posicion
-                    ? { border: `2px solid ${color}`, background: `color-mix(in srgb, ${color} 12%, white)` }
-                    : {},
-                )}
-              >
-                <icono.Icono size={28} color={icono.color} aria-hidden="true" />
-              </div>
-            ))}
-          </div>
-          <button type="button" onClick={() => setFase('interrupcion')} style={botonPrincipal(color)}>
-            Continuar
-          </button>
-        </div>
-      )}
-
-      {/* Fase 2: interrupción breve */}
-      {fase === 'interrupcion' && (
-        <div style={{ textAlign: 'center', padding: '20px 0' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }} aria-hidden="true">
-            <Hand size={44} color="var(--cp-warm)" strokeWidth={1.6} />
-          </div>
-          <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 4 }}>
-            ¡Una pausa!
-          </p>
-          <p style={{ fontSize: 13, color: 'var(--cp-text-2)', marginBottom: 18 }}>
-            Recuerda en qué ibas… y vuelve cuando estés listo.
-          </p>
-          <button type="button" onClick={() => setFase('responder')} style={botonPrincipal(color)}>
-            Volver a la tarea
-          </button>
-        </div>
-      )}
-
-      {/* Fase 3: responder cuál seguía */}
-      {fase === 'responder' && (
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: 14, color: 'var(--cp-text-2)', marginBottom: 16 }}>
-            ¿Cuál seguía en tu tarea?
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
-            {ronda.secuencia.map((icono, i) => {
-              const esElegido = elegido === icono
-              const esCorrecto = icono === ronda.siguiente
-              const borde =
-                elegido === null
-                  ? 'var(--cp-border)'
-                  : esCorrecto
-                    ? 'var(--cp-green-border)'
-                    : esElegido
-                      ? 'var(--cp-red-border)'
-                      : 'var(--cp-border)'
-              const fondo =
-                elegido !== null && esCorrecto
-                  ? 'var(--cp-green-bg)'
-                  : elegido !== null && esElegido
-                    ? 'var(--cp-red-bg)'
-                    : 'var(--cp-surface)'
-              return (
-                <button
+      <div style={estiloZonaJuego}>
+        {/* Fase 1: ver la posición actual */}
+        {fase === 'ver' && (
+          <div style={{ textAlign: 'center' }}>
+            <p
+              style={{
+                ...estiloInstruccion,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                flexWrap: 'wrap',
+              }}
+            >
+              Mira bien: vas por aquí
+              <ArrowDown size={17} aria-hidden="true" />
+              Recuerda cuál sigue.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 'clamp(8px, 1.5vw, 14px)',
+                flexWrap: 'wrap',
+                marginBottom: 26,
+              }}
+            >
+              {ronda.secuencia.map((icono, i) => (
+                <div
                   key={i}
-                  type="button"
-                  onClick={() => responder(icono)}
-                  disabled={elegido !== null}
-                  aria-label={icono.id}
-                  style={estiloCelda({
-                    border: `1.5px solid ${borde}`,
-                    background: fondo,
-                    cursor: elegido !== null ? 'default' : 'pointer',
-                    transition: 'background 0.2s ease, border-color 0.2s ease',
-                  })}
+                  style={estiloCelda(
+                    i === ronda.posicion
+                      ? { border: `3px solid ${color}`, background: `color-mix(in srgb, ${color} 12%, white)` }
+                      : {},
+                  )}
                 >
-                  <icono.Icono size={28} color={icono.color} aria-hidden="true" />
-                </button>
-              )
-            })}
+                  <icono.Icono size={34} color={icono.color} aria-hidden="true" />
+                </div>
+              ))}
+            </div>
+            <button type="button" onClick={empezarInterrupcion} style={estiloBotonPrincipal(color)}>
+              Continuar
+            </button>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Fase 2: interrupción activa — reventar todos los globos */}
+        {fase === 'interrupcion' && (
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: 19, fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 4 }}>
+              ¡Una pausa!
+            </p>
+            <p style={{ fontSize: 15, color: 'var(--cp-text-2)', marginBottom: 22 }}>
+              Revienta todos los globos para poder volver a tu tarea.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 'clamp(12px, 2.5vw, 24px)',
+                flexWrap: 'wrap',
+                minHeight: 110,
+              }}
+            >
+              {Array.from({ length: totalGlobos }, (_, i) => {
+                const reventado = globosReventados.includes(i)
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => reventarGlobo(i)}
+                    disabled={reventado}
+                    aria-label={reventado ? 'Globo reventado' : 'Reventar globo'}
+                    style={{
+                      width: 74,
+                      height: 86,
+                      border: 'none',
+                      background: 'transparent',
+                      cursor: reventado ? 'default' : 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: 'block',
+                        width: 64,
+                        height: 76,
+                        margin: '0 auto',
+                        borderRadius: '50% 50% 46% 46%',
+                        background: reventado
+                          ? 'var(--cp-surface-2)'
+                          : COLORES_GLOBO[i % COLORES_GLOBO.length],
+                        border: reventado ? '2px dashed var(--cp-border-mid)' : 'none',
+                        boxShadow: reventado ? 'none' : 'var(--sh-sm)',
+                        transform: reventado ? 'scale(0.62)' : 'scale(1)',
+                        opacity: reventado ? 0.45 : 1,
+                        transition: 'transform 0.18s ease, opacity 0.18s ease',
+                      }}
+                    />
+                  </button>
+                )
+              })}
+            </div>
+            <p style={{ fontSize: 13.5, color: 'var(--cp-text-3)', marginTop: 12 }}>
+              {globosReventados.length} de {totalGlobos}
+            </p>
+          </div>
+        )}
+
+        {/* Fase 3: responder cuál seguía (opciones barajadas, sin la secuencia a la vista) */}
+        {fase === 'responder' && (
+          <div style={{ textAlign: 'center' }}>
+            <p style={estiloInstruccion}>¿Cuál seguía en tu tarea?</p>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 'clamp(10px, 2vw, 16px)',
+                flexWrap: 'wrap',
+              }}
+            >
+              {ronda.opciones.map((icono, i) => {
+                const esElegido = elegido === icono
+                const esCorrecto = icono === ronda.siguiente
+                const borde =
+                  elegido === null
+                    ? 'var(--cp-border)'
+                    : esCorrecto
+                      ? 'var(--cp-green-border)'
+                      : esElegido
+                        ? 'var(--cp-red-border)'
+                        : 'var(--cp-border)'
+                const fondo =
+                  elegido !== null && esCorrecto
+                    ? 'var(--cp-green-bg)'
+                    : elegido !== null && esElegido
+                      ? 'var(--cp-red-bg)'
+                      : 'var(--cp-surface)'
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => responder(icono)}
+                    disabled={elegido !== null}
+                    aria-label={icono.id}
+                    style={estiloCelda({
+                      border: `2px solid ${borde}`,
+                      background: fondo,
+                      cursor: elegido !== null ? 'default' : 'pointer',
+                      transition: 'background 0.2s ease, border-color 0.2s ease',
+                    })}
+                  >
+                    <icono.Icono size={34} color={icono.color} aria-hidden="true" />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
-}
-
-function botonPrincipal(color) {
-  return {
-    padding: '11px 22px',
-    background: color,
-    color: 'white',
-    border: 'none',
-    borderRadius: 'var(--r-md)',
-    fontSize: 14,
-    fontWeight: 600,
-    fontFamily: 'var(--cp-font)',
-    cursor: 'pointer',
-  }
 }

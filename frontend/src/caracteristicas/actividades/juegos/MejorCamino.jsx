@@ -1,48 +1,73 @@
 import { useMemo, useState } from 'react'
-import { Star, X } from 'lucide-react'
+import { Rabbit, Carrot, Star, TrafficCone } from 'lucide-react'
 import CabeceraJuego from '../componentes/CabeceraJuego'
 import { useJuegoRondas } from './useJuegoRondas'
 import { entero, barajar } from './aleatorio'
+import {
+  estiloJuegoRaiz,
+  estiloZonaJuego,
+  estiloInstruccion,
+  estiloPista,
+  estiloOpcion,
+} from './estilosJuego'
 
-// Estrellas (gana) y cruces (pierde) dibujadas como íconos.
-function FilaEstrellas({ cantidad }) {
-  return Array.from({ length: cantidad }, (_, i) => (
-    <Star key={i} size={17} color="var(--cp-amber)" fill="var(--cp-amber)" aria-hidden="true" />
-  ))
+// Juego de toma de decisiones hecho literal: hay que llevar al conejo hasta la
+// zanahoria eligiendo el mejor camino. Cada camino muestra, de forma contable
+// a simple vista, las estrellas que se ganan y los conos que estorban.
+//  - Fácil: 2 caminos sin conos → gana el que tiene más estrellas.
+//  - Medio: 3 caminos; el mejor domina (más estrellas Y menos conos).
+//  - Difícil: 3 caminos; hay que sopesar estrellas contra conos.
+function crearRonda(nivel) {
+  let caminos
+
+  if (nivel === 'FACIL') {
+    const mayor = entero(3, 5)
+    const menor = entero(1, mayor - 1)
+    caminos = [
+      { estrellas: mayor, conos: 0 },
+      { estrellas: menor, conos: 0 },
+    ]
+  } else if (nivel === 'MEDIO') {
+    const mejor = { estrellas: entero(4, 5), conos: entero(0, 1) }
+    caminos = [
+      mejor,
+      { estrellas: entero(1, mejor.estrellas - 1), conos: entero(mejor.conos + 1, 3) },
+      { estrellas: entero(1, mejor.estrellas - 1), conos: entero(mejor.conos + 1, 3) },
+    ]
+  } else {
+    // Difícil: saldo neto (estrellas − conos) con máximo único.
+    do {
+      caminos = [0, 1, 2].map(() => ({ estrellas: entero(1, 5), conos: entero(0, 3) }))
+    } while (!maximoUnico(caminos))
+  }
+
+  const conIds = caminos.map((c, i) => ({ ...c, id: i, neto: c.estrellas - c.conos }))
+  const mejor = conIds.reduce((a, b) => (b.neto > a.neto ? b : a))
+  return { caminos: barajar(conIds), mejorId: mejor.id }
 }
 
-function FilaCruces({ cantidad }) {
-  return Array.from({ length: cantidad }, (_, i) => (
-    <X key={i} size={15} color="var(--cp-red)" strokeWidth={3} aria-hidden="true" />
-  ))
-}
-
-// Crea una ronda con tres opciones; cada una otorga puntos ("gana") y resta
-// puntos ("pierde"). La mejor opción es la de mayor saldo neto. Se evita el
-// empate en el máximo para que la respuesta correcta sea única.
-function maximoUnico(opciones) {
-  const netos = opciones.map((o) => o.neto)
+function maximoUnico(caminos) {
+  const netos = caminos.map((c) => c.estrellas - c.conos)
   const maximo = Math.max(...netos)
   return netos.filter((n) => n === maximo).length === 1
 }
 
-function crearRonda() {
-  let opciones
-  do {
-    opciones = [0, 1, 2].map((i) => {
-      const gana = entero(2, 6)
-      const pierde = entero(0, 3)
-      return { id: i, gana, pierde, neto: gana - pierde }
-    })
-  } while (!maximoUnico(opciones))
-
-  const mejor = opciones.reduce((a, b) => (b.neto > a.neto ? b : a))
-  return { opciones: barajar(opciones), mejorId: mejor.id }
+// Tramo punteado del camino, para que las tarjetas se lean como un recorrido.
+function Tramo() {
+  return (
+    <span
+      aria-hidden="true"
+      style={{ flex: 1, minWidth: 12, borderTop: '2px dashed var(--cp-border-mid)' }}
+    />
+  )
 }
 
-export default function MejorCamino({ configuracion, color, onTerminar }) {
+export default function MejorCamino({ configuracion, nivel, color, onTerminar }) {
   const { items, tiempoLimiteSegundos, pistas } = configuracion
-  const rondas = useMemo(() => Array.from({ length: items }, crearRonda), [items])
+  const rondas = useMemo(
+    () => Array.from({ length: items }, () => crearRonda(nivel)),
+    [items, nivel],
+  )
   const [elegida, setElegida] = useState(null)
 
   const { indice, restante, bloqueado, registrar } = useJuegoRondas({
@@ -59,7 +84,7 @@ export default function MejorCamino({ configuracion, color, onTerminar }) {
     registrar(id === ronda.mejorId, () => setElegida(null))
   }
 
-  function estadoOpcion(id) {
+  function estadoCamino(id) {
     if (elegida === null) return null
     if (id === ronda.mejorId) return 'correcta'
     if (id === elegida) return 'incorrecta'
@@ -67,7 +92,7 @@ export default function MejorCamino({ configuracion, color, onTerminar }) {
   }
 
   return (
-    <div>
+    <div style={estiloJuegoRaiz}>
       <CabeceraJuego
         titulo="Mejor Camino"
         color={color}
@@ -77,87 +102,102 @@ export default function MejorCamino({ configuracion, color, onTerminar }) {
         segundosTotales={tiempoLimiteSegundos}
       />
 
-      <p
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 5,
-          flexWrap: 'wrap',
-          fontSize: 14,
-          color: 'var(--cp-text-2)',
-          marginBottom: 14,
-        }}
-      >
-        Elige la opción que más te conviene (gana muchas
-        <Star size={15} color="var(--cp-amber)" fill="var(--cp-amber)" aria-label="estrellas" />
-        y pierde pocas
-        <X size={14} color="var(--cp-red)" strokeWidth={3} aria-label="cruces" />
-        ).
-      </p>
+      <div style={estiloZonaJuego}>
+        <p style={estiloInstruccion}>
+          ¿Por cuál camino llevas al conejo hasta la zanahoria?
+          <br />
+          <span style={{ fontSize: 15, color: 'var(--cp-text-2)' }}>
+            Gana el camino con más{' '}
+            <Star
+              size={16}
+              color="var(--cp-amber)"
+              fill="var(--cp-amber)"
+              aria-label="estrellas"
+              style={{ verticalAlign: -2 }}
+            />{' '}
+            y menos{' '}
+            <TrafficCone
+              size={16}
+              color="#C06515"
+              aria-label="conos"
+              style={{ verticalAlign: -2 }}
+            />
+            .
+          </span>
+        </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 360, marginInline: 'auto' }}>
-        {ronda.opciones.map((op) => {
-          const estado = estadoOpcion(op.id)
-          const borde =
-            estado === 'correcta'
-              ? 'var(--cp-green-border)'
-              : estado === 'incorrecta'
-                ? 'var(--cp-red-border)'
-                : 'var(--cp-border)'
-          const fondo =
-            estado === 'correcta'
-              ? 'var(--cp-green-bg)'
-              : estado === 'incorrecta'
-                ? 'var(--cp-red-bg)'
-                : 'var(--cp-surface)'
-          return (
-            <button
-              key={op.id}
-              type="button"
-              onClick={() => responder(op.id)}
-              disabled={bloqueado}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '14px 16px',
-                background: fondo,
-                border: `1.5px solid ${borde}`,
-                borderRadius: 'var(--r-md)',
-                cursor: bloqueado ? 'default' : 'pointer',
-                fontFamily: 'var(--cp-font)',
-                transition: 'background 0.2s ease, border-color 0.2s ease',
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: 2 }} aria-hidden="true">
-                <FilaEstrellas cantidad={op.gana} />
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 1 }} aria-hidden="true">
-                  {op.pierde > 0 ? (
-                    <FilaCruces cantidad={op.pierde} />
-                  ) : (
-                    <span style={{ fontSize: 16, color: 'var(--cp-text-3)' }}>—</span>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 14,
+            width: '100%',
+            maxWidth: 620,
+            marginInline: 'auto',
+          }}
+        >
+          {ronda.caminos.map((camino) => {
+            const estado = estadoCamino(camino.id)
+            return (
+              <button
+                key={camino.id}
+                type="button"
+                onClick={() => responder(camino.id)}
+                disabled={bloqueado}
+                aria-label={`Camino con ${camino.estrellas} estrellas y ${camino.conos} conos`}
+                style={estiloOpcion(estado, bloqueado, {
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  width: '100%',
+                })}
+              >
+                <Rabbit size={30} color="var(--cp-text-2)" aria-hidden="true" style={{ flexShrink: 0 }} />
+                <Tramo />
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                  }}
+                  aria-hidden="true"
+                >
+                  {Array.from({ length: camino.estrellas }, (_, i) => (
+                    <Star key={`e${i}`} size={24} color="var(--cp-amber)" fill="var(--cp-amber)" />
+                  ))}
+                  {Array.from({ length: camino.conos }, (_, i) => (
+                    <TrafficCone key={`c${i}`} size={24} color="#C06515" />
+                  ))}
+                </span>
+                <Tramo />
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <Carrot size={30} color="#C06515" aria-hidden="true" />
+                  {pistas && (
+                    <span
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: 'var(--cp-text-2)',
+                        minWidth: 30,
+                        textAlign: 'right',
+                      }}
+                    >
+                      {camino.neto >= 0 ? `+${camino.neto}` : camino.neto}
+                    </span>
                   )}
                 </span>
-                {pistas && (
-                  <span
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: 'var(--cp-text-2)',
-                      minWidth: 34,
-                      textAlign: 'right',
-                    }}
-                  >
-                    {op.neto >= 0 ? `+${op.neto}` : op.neto}
-                  </span>
-                )}
-              </span>
-            </button>
-          )
-        })}
+              </button>
+            )
+          })}
+        </div>
+
+        {pistas && (
+          <p style={{ ...estiloPista, marginTop: 14 }}>
+            Pista: el numerito muestra cuánto vale cada camino.
+          </p>
+        )}
       </div>
     </div>
   )

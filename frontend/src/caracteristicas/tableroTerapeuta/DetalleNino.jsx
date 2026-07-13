@@ -4,6 +4,7 @@ import { Frown } from 'lucide-react'
 import BarraSuperior from '../../componentes/BarraSuperior'
 import PantallaCargando from '../../componentes/PantallaCargando'
 import EstadoVacio from '../../componentes/EstadoVacio'
+import useMediaQuery, { CONSULTA_ESCRITORIO } from '../../hooks/useMediaQuery'
 import { obtenerNino } from '../../servicios/ninos.servicio'
 import { obtenerFunciones } from '../../servicios/catalogo.servicio'
 import {
@@ -32,6 +33,7 @@ import { botonSecundario } from './detalle/estilos'
 export default function DetalleNino() {
   const { ninoId } = useParams()
   const navegar = useNavigate()
+  const esEscritorio = useMediaQuery(CONSULTA_ESCRITORIO)
 
   const [nino, setNino] = useState(null)
   const [funciones, setFunciones] = useState([])
@@ -130,7 +132,9 @@ export default function DetalleNino() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'minmax(300px, 360px) minmax(0, 1fr)',
+              gridTemplateColumns: esEscritorio
+                ? 'minmax(300px, 360px) minmax(0, 1fr)'
+                : 'minmax(0, 1fr)',
               gap: 16,
               alignItems: 'start',
             }}

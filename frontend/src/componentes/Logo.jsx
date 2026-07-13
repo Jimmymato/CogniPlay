@@ -1,8 +1,12 @@
 // Logo de la marca. `compact` oculta el texto y deja solo el isotipo.
 export default function Logo({ size = 30, compact = false }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+    <div
+      role="img"
+      aria-label="CogniPlay"
+      style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+    >
+      <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
         <rect width="32" height="32" rx="9" fill="var(--cp-blue)" />
         <circle cx="12" cy="16" r="5.5" stroke="white" strokeWidth="1.8" fill="none" />
         <circle cx="20" cy="16" r="5.5" stroke="white" strokeWidth="1.8" fill="none" />

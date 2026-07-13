@@ -14,7 +14,6 @@ const estilos = {
     color: 'var(--cp-text-1)',
     background: 'var(--cp-surface)',
     fontFamily: 'var(--cp-font)',
-    outline: 'none',
   },
   label: {
     display: 'block',

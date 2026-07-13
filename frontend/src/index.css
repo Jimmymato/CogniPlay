@@ -23,6 +23,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Foco visible para navegación con teclado (accesibilidad). Los estilos en
+   línea no pueden expresar :focus-visible, por eso la regla es global. */
+:focus-visible {
+  outline: 3px solid var(--cp-blue-dark);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Pulso suave para elementos que indican "algo está en curso" (p. ej. el
+   círculo del conteo mental en Cuenta el Tiempo). */
+@keyframes cp-pulso {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
 /* Respeta la preferencia del sistema de reducir animaciones (accesibilidad). */
 @media (prefers-reduced-motion: reduce) {
   *,

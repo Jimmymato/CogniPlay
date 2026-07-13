@@ -11,4 +11,9 @@ export const entorno = {
   databaseUrl: requerido('DATABASE_URL'),
   jwtSecret: requerido('JWT_SECRET'),
   jwtExpiracion: process.env.JWT_EXPIRACION ?? '7d',
+  // Orígenes permitidos para CORS, separados por coma. Vacío = todos (desarrollo).
+  corsOrigenes: (process.env.CORS_ORIGEN ?? '')
+    .split(',')
+    .map((origen) => origen.trim())
+    .filter(Boolean),
 }

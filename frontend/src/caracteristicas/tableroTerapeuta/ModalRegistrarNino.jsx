@@ -73,6 +73,8 @@ export default function ModalRegistrarNino({ onCerrar, onCreado }) {
         style={{
           width: '100%',
           maxWidth: 440,
+          maxHeight: '90dvh',
+          overflowY: 'auto',
           background: 'var(--cp-surface)',
           borderRadius: 'var(--r-xl)',
           boxShadow: 'var(--sh-lg)',
@@ -90,8 +92,9 @@ export default function ModalRegistrarNino({ onCerrar, onCreado }) {
         </p>
 
         <form onSubmit={enviar} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <Campo etiqueta="Nombres" style={{ flex: 1 }}>
+          {/* En pantallas angostas la fila se parte y queda en una columna. */}
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <Campo etiqueta="Nombres" style={{ flex: 1, minWidth: 150 }}>
               <input
                 ref={primerCampoRef}
                 type="text"
@@ -101,7 +104,7 @@ export default function ModalRegistrarNino({ onCerrar, onCreado }) {
                 style={estiloEntrada}
               />
             </Campo>
-            <Campo etiqueta="Apellidos" style={{ flex: 1 }}>
+            <Campo etiqueta="Apellidos" style={{ flex: 1, minWidth: 150 }}>
               <input
                 type="text"
                 required

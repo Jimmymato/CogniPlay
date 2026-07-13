@@ -2,16 +2,31 @@ import { useEffect, useRef, useState } from 'react'
 import { Target, Hourglass, Smile } from 'lucide-react'
 import CabeceraJuego from '../componentes/CabeceraJuego'
 import { entero } from './aleatorio'
+import {
+  estiloJuegoRaiz,
+  estiloZonaJuego,
+  estiloInstruccion,
+  estiloPista,
+  estiloBotonPrincipal,
+} from './estilosJuego'
 
-// Juego de estimación temporal: se pide al niño contar mentalmente cierta
-// cantidad de segundos y tocar cuando crea que han pasado. No se muestra ningún
-// reloj. Acierta si su estimación cae dentro de la tolerancia (±35 %, mínimo 1s).
-export default function CuentaElTiempo({ configuracion, color, onTerminar }) {
+// Segundos a contar y tolerancia (proporción del objetivo) según dificultad.
+const RANGO_OBJETIVO = { FACIL: [3, 4], MEDIO: [3, 6], DIFICIL: [4, 8] }
+const TOLERANCIA = { FACIL: 0.45, MEDIO: 0.35, DIFICIL: 0.25 }
+
+// Juego de estimación temporal: el niño decide cuándo empezar a contar (botón
+// "¡Empezar!"), cuenta mentalmente los segundos pedidos y toca "¡Ya pasó!"
+// cuando cree que transcurrieron. No se muestra ningún reloj. Acierta si su
+// estimación cae dentro de la tolerancia del nivel.
+export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar }) {
   const { items, pistas } = configuracion
-  const objetivos = useRef(Array.from({ length: items }, () => entero(2, 5)))
+  const [minimo, maximo] = RANGO_OBJETIVO[nivel] ?? RANGO_OBJETIVO.MEDIO
+  const tolerancia = TOLERANCIA[nivel] ?? TOLERANCIA.MEDIO
+
+  const objetivos = useRef(Array.from({ length: items }, () => entero(minimo, maximo)))
 
   const [indice, setIndice] = useState(0)
-  const [fase, setFase] = useState('espera') // 'espera' | 'feedback'
+  const [fase, setFase] = useState('listo') // 'listo' | 'contando' | 'feedback'
   const [info, setInfo] = useState(null) // { transcurrido, objetivo, estado }
 
   const aciertosRef = useRef(0)
@@ -22,7 +37,12 @@ export default function CuentaElTiempo({ configuracion, color, onTerminar }) {
   const inicioItemRef = useRef(Date.now())
   const maxTimerRef = useRef(null)
 
-  useEffect(() => () => { montadoRef.current = false }, [])
+  // El cuerpo vuelve a marcar "montado" porque StrictMode monta, desmonta y
+  // remonta el componente en desarrollo; solo limpiar dejaría el ref en false.
+  useEffect(() => {
+    montadoRef.current = true
+    return () => { montadoRef.current = false }
+  }, [])
 
   function finalizar() {
     if (finalizadoRef.current) return
@@ -48,43 +68,47 @@ export default function CuentaElTiempo({ configuracion, color, onTerminar }) {
       if (indice + 1 >= items) {
         finalizar()
       } else {
-        setFase('espera')
+        setFase('listo')
         setIndice((i) => i + 1)
       }
-    }, 1200)
+    }, 1800)
   }
 
-  // Cada ítem reinicia el cronómetro interno y programa una omisión si tarda demasiado.
-  useEffect(() => {
-    if (finalizadoRef.current) return undefined
+  // El conteo empieza cuando el niño lo decide; desde ahí corre el cronómetro
+  // interno y una omisión programada por si tarda demasiado.
+  function empezar() {
+    if (fase !== 'listo') return
     inicioItemRef.current = Date.now()
     const objetivo = objetivos.current[indice]
     maxTimerRef.current = setTimeout(
-      () => resolver('omision', { transcurrido: null, objetivo }),
-      (objetivo * 2 + 2) * 1000,
+      () => {
+        if (montadoRef.current) resolver('omision', { transcurrido: null, objetivo })
+      },
+      (objetivo * 2 + 3) * 1000,
     )
-    return () => clearTimeout(maxTimerRef.current)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indice])
+    setFase('contando')
+  }
 
-  function tocar() {
-    if (fase !== 'espera') return
+  useEffect(() => () => clearTimeout(maxTimerRef.current), [])
+
+  function yaPaso() {
+    if (fase !== 'contando') return
     clearTimeout(maxTimerRef.current)
     const objetivo = objetivos.current[indice]
     const transcurrido = (Date.now() - inicioItemRef.current) / 1000
-    const tolerancia = Math.max(1, objetivo * 0.35)
-    const acierto = Math.abs(transcurrido - objetivo) <= tolerancia
+    const margen = Math.max(1, objetivo * tolerancia)
+    const acierto = Math.abs(transcurrido - objetivo) <= margen
     resolver(acierto ? 'acierto' : 'error', {
       transcurrido: Math.round(transcurrido * 10) / 10,
       objetivo,
+      margen,
     })
   }
 
   const objetivo = objetivos.current[indice]
-  const enFeedback = fase === 'feedback'
 
   return (
-    <div>
+    <div style={estiloJuegoRaiz}>
       <CabeceraJuego
         titulo="Cuenta el Tiempo"
         color={color}
@@ -94,71 +118,146 @@ export default function CuentaElTiempo({ configuracion, color, onTerminar }) {
         segundosTotales={0}
       />
 
-      {!enFeedback && (
-        <>
-          <p style={{ textAlign: 'center', fontSize: 15, color: 'var(--cp-text-2)', marginBottom: 4 }}>
-            Cuenta en tu mente
-          </p>
-          <p style={{ textAlign: 'center', fontSize: 40, fontWeight: 700, color, marginBottom: 6 }}>
-            {objetivo} segundos
-          </p>
-          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--cp-text-3)', marginBottom: 18 }}>
-            y toca el botón cuando creas que ya pasaron.
-            {pistas && ' Pista: cuenta "mil uno, mil dos…".'}
-          </p>
-
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <button
-              type="button"
-              onClick={tocar}
+      <div style={estiloZonaJuego}>
+        {fase === 'listo' && (
+          <div style={{ textAlign: 'center' }}>
+            <p style={estiloInstruccion}>Cuando toques el botón, cuenta en tu mente</p>
+            <p
               style={{
-                width: 170,
-                height: 170,
-                borderRadius: '50%',
-                border: 'none',
-                background: color,
-                color: 'white',
-                fontSize: 20,
+                fontSize: 'clamp(38px, 7vw, 52px)',
                 fontWeight: 700,
-                fontFamily: 'var(--cp-font)',
-                cursor: 'pointer',
-                boxShadow: 'var(--sh-md)',
+                color,
+                textAlign: 'center',
+                letterSpacing: '-0.03em',
+                marginBottom: 8,
               }}
             >
+              {objetivo} segundos
+            </p>
+            <p style={{ ...estiloPista, marginBottom: 22 }}>
+              y avisa cuando creas que ya pasaron.
+              {pistas && ' Pista: cuenta "mil uno, mil dos…".'}
+            </p>
+            <button type="button" onClick={empezar} style={estiloBotonPrincipal(color, { minWidth: 220 })}>
+              ¡Empezar a contar!
+            </button>
+          </div>
+        )}
+
+        {fase === 'contando' && (
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+              <div
+                aria-hidden="true"
+                style={{
+                  width: 140,
+                  height: 140,
+                  borderRadius: '50%',
+                  background: `color-mix(in srgb, ${color} 14%, white)`,
+                  border: `3px solid ${color}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 40,
+                  fontWeight: 700,
+                  color,
+                  animation: 'cp-pulso 1.5s ease-in-out infinite',
+                }}
+              >
+                {objetivo}s
+              </div>
+            </div>
+            <p style={{ ...estiloInstruccion, marginBottom: 22 }}>
+              Cuenta {objetivo} segundos en tu mente…
+            </p>
+            <button type="button" onClick={yaPaso} style={estiloBotonPrincipal(color, { minWidth: 220 })}>
               ¡Ya pasó!
             </button>
           </div>
-        </>
-      )}
+        )}
 
-      {enFeedback && info && (
-        <div style={{ textAlign: 'center', padding: '24px 12px' }}>
-          <div
-            style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}
-            aria-hidden="true"
-          >
-            {info.estado === 'acierto' ? (
-              <Target size={48} color="var(--cp-green)" strokeWidth={1.6} />
-            ) : info.estado === 'omision' ? (
-              <Hourglass size={48} color="var(--cp-amber)" strokeWidth={1.6} />
-            ) : (
-              <Smile size={48} color="var(--cp-text-2)" strokeWidth={1.6} />
+        {fase === 'feedback' && info && (
+          <div style={{ textAlign: 'center', padding: '12px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }} aria-hidden="true">
+              {info.estado === 'acierto' ? (
+                <Target size={54} color="var(--cp-green)" strokeWidth={1.6} />
+              ) : info.estado === 'omision' ? (
+                <Hourglass size={54} color="var(--cp-amber)" strokeWidth={1.6} />
+              ) : (
+                <Smile size={54} color="var(--cp-text-2)" strokeWidth={1.6} />
+              )}
+            </div>
+            <p style={{ fontSize: 19, fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 6 }}>
+              {info.estado === 'acierto'
+                ? '¡Muy buen cálculo!'
+                : info.estado === 'omision'
+                  ? 'Pasó mucho tiempo'
+                  : info.transcurrido < info.objetivo
+                    ? 'Un poquito antes…'
+                    : 'Un poquito después…'}
+            </p>
+            <p style={{ fontSize: 15, color: 'var(--cp-text-2)', marginBottom: 16 }}>
+              {info.transcurrido !== null
+                ? `Tocaste a los ${info.transcurrido}s. El objetivo era ${info.objetivo}s.`
+                : `El objetivo era ${info.objetivo}s.`}
+            </p>
+
+            {/* Barra de cercanía: zona verde = tolerancia, punto = su toque. */}
+            {info.transcurrido !== null && (
+              <div style={{ maxWidth: 340, margin: '0 auto' }}>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'relative',
+                    height: 14,
+                    background: 'var(--cp-surface-2)',
+                    border: '1px solid var(--cp-border)',
+                    borderRadius: 'var(--r-pill)',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: `${((info.objetivo - info.margen) / (info.objetivo * 2)) * 100}%`,
+                      width: `${((info.margen * 2) / (info.objetivo * 2)) * 100}%`,
+                      top: 0,
+                      bottom: 0,
+                      background: 'var(--cp-green-bg)',
+                      border: '1px solid var(--cp-green-border)',
+                      borderRadius: 'var(--r-pill)',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: `${Math.min(98, (info.transcurrido / (info.objetivo * 2)) * 100)}%`,
+                      top: -4,
+                      width: 10,
+                      height: 20,
+                      background: info.estado === 'acierto' ? 'var(--cp-green)' : 'var(--cp-red)',
+                      borderRadius: 'var(--r-pill)',
+                      transform: 'translateX(-50%)',
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: 12,
+                    color: 'var(--cp-text-3)',
+                    marginTop: 4,
+                  }}
+                >
+                  <span>0s</span>
+                  <span>{info.objetivo}s</span>
+                  <span>{info.objetivo * 2}s</span>
+                </div>
+              </div>
             )}
           </div>
-          <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 4 }}>
-            {info.estado === 'acierto'
-              ? '¡Muy buen cálculo!'
-              : info.estado === 'omision'
-                ? 'Se acabó el tiempo'
-                : 'Casi…'}
-          </p>
-          <p style={{ fontSize: 13, color: 'var(--cp-text-2)' }}>
-            {info.transcurrido !== null
-              ? `Tocaste a los ${info.transcurrido}s (objetivo: ${info.objetivo}s).`
-              : `El objetivo era ${info.objetivo}s.`}
-          </p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

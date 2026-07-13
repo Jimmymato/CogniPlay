@@ -4,11 +4,10 @@ import Logo from './Logo'
 import { useAuth } from '../caracteristicas/autenticacion/ContextoAuth'
 import { RUTAS } from '../app/enrutador/rutas'
 
-// Elementos de navegación del terapeuta. "Reportes" llegará con la subfase 5.7,
-// por eso se muestra deshabilitado con la insignia "Pronto".
+// Elementos de navegación del terapeuta.
 const ELEMENTOS = [
   { id: 'inicio', icono: Home, etiqueta: 'Inicio', ruta: RUTAS.terapeuta },
-  { id: 'reportes', icono: ChartColumn, etiqueta: 'Reportes', proximamente: true },
+  { id: 'reportes', icono: ChartColumn, etiqueta: 'Reportes', ruta: RUTAS.reportes },
 ]
 
 // Barra lateral del terapeuta (solo escritorio): marca, navegación y la sesión

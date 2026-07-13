@@ -3,6 +3,7 @@ export const RUTAS = {
   login: '/login',
   inicio: '/',
   terapeuta: '/terapeuta',
+  reportes: '/terapeuta/reportes',
   detalleNino: '/terapeuta/nino/:ninoId',
   nino: '/nino',
   actividadNino: '/nino/actividad/:actividadId',
