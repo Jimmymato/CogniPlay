@@ -91,8 +91,8 @@ export default function PantallaActividad() {
       <BarraSuperior />
       <main
         style={{
-          padding: 'clamp(16px, 3vw, 28px) clamp(16px, 4vw, 40px) 48px',
-          maxWidth: 1280,
+          padding: 'clamp(14px, 2vw, 24px) clamp(12px, 2vw, 28px) 40px',
+          maxWidth: 1600,
           margin: '0 auto',
         }}
       >
@@ -117,26 +117,26 @@ export default function PantallaActividad() {
         )}
 
         {estado === 'seleccion' && actividad && (
-          <div style={{ maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ maxWidth: 940, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 28 }}>
               <div
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: 92,
-                  height: 92,
+                  width: 'clamp(92px, 9vw, 120px)',
+                  height: 'clamp(92px, 9vw, 120px)',
                   borderRadius: 'var(--r-2xl)',
                   background: `color-mix(in srgb, ${color} 14%, white)`,
                   marginBottom: 14,
                 }}
                 aria-hidden="true"
               >
-                <IconoActividad nombre={actividad.icono} size={52} color={color} strokeWidth={1.6} />
+                <IconoActividad nombre={actividad.icono} size={64} color={color} strokeWidth={1.6} />
               </div>
               <h1
                 style={{
-                  fontSize: 'clamp(24px, 4vw, 30px)',
+                  fontSize: 'clamp(26px, 3vw, 38px)',
                   fontWeight: 700,
                   letterSpacing: '-0.02em',
                   color: 'var(--cp-text-1)',
@@ -144,14 +144,14 @@ export default function PantallaActividad() {
               >
                 {actividad.nombre}
               </h1>
-              <p style={{ fontSize: 'clamp(14px, 2.2vw, 16px)', color: 'var(--cp-text-2)', marginTop: 6 }}>
+              <p style={{ fontSize: 'clamp(15px, 1.6vw, 19px)', color: 'var(--cp-text-2)', marginTop: 6 }}>
                 {actividad.descripcion}
               </p>
             </div>
 
             <p
               style={{
-                fontSize: 15,
+                fontSize: 'clamp(15px, 1.5vw, 18px)',
                 fontWeight: 700,
                 color: 'var(--cp-text-2)',
                 marginBottom: 12,
@@ -177,8 +177,8 @@ export default function PantallaActividad() {
                     flexDirection: 'column',
                     alignItems: 'flex-start',
                     gap: 6,
-                    padding: '20px 18px',
-                    minHeight: 110,
+                    padding: '24px 22px',
+                    minHeight: 130,
                     background: 'var(--cp-surface)',
                     border: '1px solid var(--cp-border)',
                     borderRadius: 'var(--r-lg)',
@@ -188,13 +188,13 @@ export default function PantallaActividad() {
                     boxShadow: 'var(--sh-sm)',
                   }}
                 >
-                  <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--cp-text-1)' }}>
+                  <span style={{ fontSize: 'clamp(18px, 1.8vw, 22px)', fontWeight: 700, color: 'var(--cp-text-1)' }}>
                     {ETIQUETA_NIVEL[n.nivel] ?? n.nivel}
                   </span>
-                  <span style={{ fontSize: 13, color: 'var(--cp-text-2)' }}>
+                  <span style={{ fontSize: 'clamp(13px, 1.3vw, 16px)', color: 'var(--cp-text-2)' }}>
                     {DESCRIPCION_NIVEL[n.nivel] ?? ''}
                   </span>
-                  <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--cp-text-3)' }}>
+                  <span style={{ fontSize: 'clamp(12.5px, 1.2vw, 15px)', fontWeight: 600, color: 'var(--cp-text-3)' }}>
                     {n.configuracion.items} ítems · {n.configuracion.tiempoLimiteSegundos}s
                   </span>
                 </button>
@@ -260,7 +260,7 @@ export default function PantallaActividad() {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                minHeight: 'min(76vh, 780px)',
+                minHeight: '76vh',
                 padding: 'clamp(18px, 3.5vw, 40px)',
                 background: 'var(--cp-surface)',
                 border: '1px solid var(--cp-border)',

@@ -127,8 +127,8 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
 
   function estiloCelda(extra) {
     return {
-      width: 'clamp(64px, 9vw, 96px)',
-      height: 'clamp(64px, 9vw, 96px)',
+      width: 'clamp(72px, 10vw, 150px)',
+      height: 'clamp(72px, 10vw, 150px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -165,14 +165,14 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
               }}
             >
               Mira bien: vas por aquí
-              <ArrowDown size={17} aria-hidden="true" />
+              <ArrowDown size={22} aria-hidden="true" />
               Recuerda cuál sigue.
             </p>
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'center',
-                gap: 'clamp(8px, 1.5vw, 14px)',
+                gap: 'clamp(8px, 1.5vw, 22px)',
                 flexWrap: 'wrap',
                 marginBottom: 26,
               }}
@@ -186,7 +186,7 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                       : {},
                   )}
                 >
-                  <icono.Icono size={44} color={icono.color} aria-hidden="true" />
+                  <icono.Icono size={64} color={icono.color} aria-hidden="true" />
                 </div>
               ))}
             </div>
@@ -199,10 +199,10 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
         {/* Fase 2: interrupción activa — reventar todos los globos */}
         {fase === 'interrupcion' && (
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 19, fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 4 }}>
+            <p style={{ fontSize: 'clamp(19px, 2vw, 26px)', fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 4 }}>
               ¡Una pausa!
             </p>
-            <p style={{ fontSize: 15, color: 'var(--cp-text-2)', marginBottom: 22 }}>
+            <p style={{ fontSize: 'clamp(15px, 1.6vw, 19px)', color: 'var(--cp-text-2)', marginBottom: 22 }}>
               Revienta todos los globos para poder volver a tu tarea.
             </p>
             <div
@@ -210,9 +210,9 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                gap: 'clamp(12px, 2.5vw, 24px)',
+                gap: 'clamp(12px, 2.5vw, 36px)',
                 flexWrap: 'wrap',
-                minHeight: 110,
+                minHeight: 150,
               }}
             >
               {Array.from({ length: totalGlobos }, (_, i) => {
@@ -225,8 +225,8 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                     disabled={reventado}
                     aria-label={reventado ? 'Globo reventado' : 'Reventar globo'}
                     style={{
-                      width: 90,
-                      height: 106,
+                      width: 116,
+                      height: 136,
                       border: 'none',
                       background: 'transparent',
                       cursor: reventado ? 'default' : 'pointer',
@@ -236,8 +236,8 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                     <span
                       style={{
                         display: 'block',
-                        width: 78,
-                        height: 94,
+                        width: 100,
+                        height: 120,
                         margin: '0 auto',
                         borderRadius: '50% 50% 46% 46%',
                         background: reventado
@@ -254,7 +254,7 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                 )
               })}
             </div>
-            <p style={{ fontSize: 13.5, color: 'var(--cp-text-3)', marginTop: 12 }}>
+            <p style={{ fontSize: 'clamp(13.5px, 1.4vw, 17px)', color: 'var(--cp-text-3)', marginTop: 12 }}>
               {globosReventados.length} de {totalGlobos}
             </p>
           </div>
@@ -268,7 +268,7 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
               style={{
                 display: 'flex',
                 justifyContent: 'center',
-                gap: 'clamp(10px, 2vw, 16px)',
+                gap: 'clamp(10px, 2vw, 24px)',
                 flexWrap: 'wrap',
               }}
             >
@@ -303,7 +303,7 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                       transition: 'background 0.2s ease, border-color 0.2s ease',
                     })}
                   >
-                    <icono.Icono size={44} color={icono.color} aria-hidden="true" />
+                    <icono.Icono size={64} color={icono.color} aria-hidden="true" />
                   </button>
                 )
               })}

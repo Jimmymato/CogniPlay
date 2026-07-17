@@ -24,10 +24,10 @@ export default function CabeceraJuego({
           marginBottom: 8,
         }}
       >
-        <span style={{ fontSize: 'clamp(16px, 1.6vw, 19px)', fontWeight: 700, color: 'var(--cp-text-1)' }}>
+        <span style={{ fontSize: 'clamp(16px, 1.6vw, 23px)', fontWeight: 700, color: 'var(--cp-text-1)' }}>
           {titulo}
         </span>
-        <span style={{ fontSize: 'clamp(13.5px, 1.4vw, 15.5px)', fontWeight: 600, color: 'var(--cp-text-2)' }}>
+        <span style={{ fontSize: 'clamp(13.5px, 1.4vw, 17px)', fontWeight: 600, color: 'var(--cp-text-2)' }}>
           Ítem {Math.min(indice + 1, total)} de {total}
         </span>
       </div>
@@ -39,7 +39,7 @@ export default function CabeceraJuego({
         aria-valuemax={total}
         aria-valuenow={indice}
         style={{
-          height: 6,
+          height: 8,
           background: 'var(--cp-border)',
           borderRadius: 'var(--r-pill)',
           overflow: 'hidden',
@@ -60,11 +60,11 @@ export default function CabeceraJuego({
       {/* Tiempo restante */}
       {segundosTotales > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Timer size={14} color="var(--cp-text-2)" aria-hidden="true" style={{ flexShrink: 0 }} />
+          <Timer size={18} color="var(--cp-text-2)" aria-hidden="true" style={{ flexShrink: 0 }} />
           <div
             style={{
               flex: 1,
-              height: 8,
+              height: 10,
               background: 'var(--cp-surface-2)',
               borderRadius: 'var(--r-pill)',
               overflow: 'hidden',
@@ -82,11 +82,11 @@ export default function CabeceraJuego({
           </div>
           <span
             style={{
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: 600,
               color: colorTiempo,
               fontFamily: 'var(--cp-font-mono)',
-              minWidth: 28,
+              minWidth: 36,
               textAlign: 'right',
             }}
           >

@@ -85,9 +85,9 @@ function Ventana({ titulo, colorMarco, contenido }) {
     >
       <div
         style={{
-          padding: '7px 10px',
+          padding: '9px 12px',
           background: `color-mix(in srgb, ${colorMarco} 14%, white)`,
-          fontSize: 13.5,
+          fontSize: 'clamp(13.5px, 1.4vw, 17px)',
           fontWeight: 700,
           color: 'var(--cp-text-1)',
           textAlign: 'center',
@@ -97,17 +97,17 @@ function Ventana({ titulo, colorMarco, contenido }) {
       </div>
       <div
         style={{
-          minHeight: 'clamp(110px, 16vh, 150px)',
+          minHeight: 'clamp(120px, 20vh, 210px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 18,
-          padding: 16,
+          gap: 24,
+          padding: 18,
           flexWrap: 'wrap',
         }}
       >
         {contenido.map((objeto, i) => (
-          <Objeto key={`${objeto.id}${i}`} objeto={objeto} tam={56} />
+          <Objeto key={`${objeto.id}${i}`} objeto={objeto} tam={76} />
         ))}
       </div>
     </div>
@@ -167,10 +167,10 @@ export default function DosALaVez({ configuracion, nivel, color, onTerminar }) {
       <div style={estiloZonaJuego}>
         <p style={{ ...estiloInstruccion, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
           ¿Está
-          <Objeto objeto={objetivoIzq} tam={32} />
+          <Objeto objeto={objetivoIzq} tam={40} />
           en la <strong>ventana azul</strong>
           <span aria-hidden="true">y</span>
-          <Objeto objeto={objetivoDer} tam={32} />
+          <Objeto objeto={objetivoDer} tam={40} />
           en la <strong>ventana amarilla</strong>?
         </p>
 
@@ -178,9 +178,9 @@ export default function DosALaVez({ configuracion, nivel, color, onTerminar }) {
         <div
           style={{
             display: 'flex',
-            gap: 'clamp(10px, 2vw, 20px)',
+            gap: 'clamp(10px, 2vw, 28px)',
             width: '100%',
-            maxWidth: 780,
+            maxWidth: 1000,
             marginInline: 'auto',
             marginBottom: 18,
           }}
@@ -202,7 +202,7 @@ export default function DosALaVez({ configuracion, nivel, color, onTerminar }) {
             gridTemplateColumns: '1fr 1fr',
             gap: 14,
             width: '100%',
-            maxWidth: 420,
+            maxWidth: 560,
             marginInline: 'auto',
           }}
         >
@@ -216,7 +216,7 @@ export default function DosALaVez({ configuracion, nivel, color, onTerminar }) {
               onClick={() => responder(b.clave)}
               disabled={bloqueado}
               style={estiloOpcion(estadoBoton(b.clave), bloqueado, {
-                fontSize: 24,
+                fontSize: 'clamp(24px, 2.2vw, 30px)',
                 fontWeight: 700,
                 color: 'var(--cp-text-1)',
               })}

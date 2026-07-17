@@ -101,15 +101,15 @@ export default function PanelNino() {
       <BarraSuperior />
       <main
         style={{
-          padding: 'clamp(20px, 3vw, 32px) clamp(16px, 4vw, 40px) 48px',
-          maxWidth: 1120,
+          padding: 'clamp(18px, 2.5vw, 30px) clamp(14px, 2.5vw, 32px) 48px',
+          maxWidth: 1500,
           margin: '0 auto',
         }}
       >
         <header style={{ marginBottom: 24 }}>
           <h1
             style={{
-              fontSize: 'clamp(24px, 4vw, 30px)',
+              fontSize: 'clamp(26px, 3vw, 38px)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               marginBottom: 4,
@@ -119,9 +119,9 @@ export default function PanelNino() {
             }}
           >
             {saludoPorHora()}, {nombre}
-            <Hand size={26} color="var(--cp-warm)" aria-hidden="true" />
+            <Hand size={32} color="var(--cp-warm)" aria-hidden="true" />
           </h1>
-          <p style={{ color: 'var(--cp-text-2)', fontSize: 'clamp(14px, 2.2vw, 16px)' }}>
+          <p style={{ color: 'var(--cp-text-2)', fontSize: 'clamp(15px, 1.6vw, 19px)' }}>
             Elige una actividad para empezar a jugar.
           </p>
         </header>
@@ -148,8 +148,8 @@ export default function PanelNino() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(310px, 100%), 1fr))',
-              gap: 16,
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))',
+              gap: 'clamp(16px, 1.6vw, 24px)',
             }}
           >
             {actividades.map(({ actividad, funcion }) => (

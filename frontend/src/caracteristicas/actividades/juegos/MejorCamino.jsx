@@ -106,10 +106,10 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
         <p style={estiloInstruccion}>
           ¿Por cuál camino llevas al conejo hasta la zanahoria?
           <br />
-          <span style={{ fontSize: 15, color: 'var(--cp-text-2)' }}>
+          <span style={{ fontSize: 'clamp(15px, 1.6vw, 19px)', color: 'var(--cp-text-2)' }}>
             Gana el camino con más{' '}
             <Star
-              size={16}
+              size={20}
               color="var(--cp-amber)"
               fill="var(--cp-amber)"
               aria-label="estrellas"
@@ -117,7 +117,7 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
             />{' '}
             y menos{' '}
             <TrafficCone
-              size={16}
+              size={20}
               color="#C06515"
               aria-label="conos"
               style={{ verticalAlign: -2 }}
@@ -130,9 +130,9 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 14,
+            gap: 'clamp(14px, 1.6vw, 20px)',
             width: '100%',
-            maxWidth: 760,
+            maxWidth: 960,
             marginInline: 'auto',
           }}
         >
@@ -152,7 +152,7 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
                   width: '100%',
                 })}
               >
-                <Rabbit size={38} color="var(--cp-text-2)" aria-hidden="true" style={{ flexShrink: 0 }} />
+                <Rabbit size={52} color="var(--cp-text-2)" aria-hidden="true" style={{ flexShrink: 0 }} />
                 <Tramo />
                 <span
                   style={{
@@ -165,22 +165,22 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
                   aria-hidden="true"
                 >
                   {Array.from({ length: camino.estrellas }, (_, i) => (
-                    <Star key={`e${i}`} size={30} color="var(--cp-amber)" fill="var(--cp-amber)" />
+                    <Star key={`e${i}`} size={38} color="var(--cp-amber)" fill="var(--cp-amber)" />
                   ))}
                   {Array.from({ length: camino.conos }, (_, i) => (
-                    <TrafficCone key={`c${i}`} size={30} color="#C06515" />
+                    <TrafficCone key={`c${i}`} size={38} color="#C06515" />
                   ))}
                 </span>
                 <Tramo />
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  <Carrot size={38} color="#C06515" aria-hidden="true" />
+                  <Carrot size={52} color="#C06515" aria-hidden="true" />
                   {pistas && (
                     <span
                       style={{
-                        fontSize: 14,
+                        fontSize: 'clamp(14px, 1.4vw, 18px)',
                         fontWeight: 700,
                         color: 'var(--cp-text-2)',
-                        minWidth: 30,
+                        minWidth: 36,
                         textAlign: 'right',
                       }}
                     >

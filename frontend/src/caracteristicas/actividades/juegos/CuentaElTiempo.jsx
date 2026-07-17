@@ -124,7 +124,7 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
             <p style={estiloInstruccion}>Cuando toques el botón, cuenta en tu mente</p>
             <p
               style={{
-                fontSize: 'clamp(42px, 6vw, 64px)',
+                fontSize: 'clamp(46px, 6vw, 88px)',
                 fontWeight: 700,
                 color,
                 textAlign: 'center',
@@ -150,15 +150,15 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
               <div
                 aria-hidden="true"
                 style={{
-                  width: 'clamp(150px, 18vw, 190px)',
-                  height: 'clamp(150px, 18vw, 190px)',
+                  width: 'clamp(160px, 20vw, 260px)',
+                  height: 'clamp(160px, 20vw, 260px)',
                   borderRadius: '50%',
                   background: `color-mix(in srgb, ${color} 14%, white)`,
                   border: `3px solid ${color}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 46,
+                  fontSize: 'clamp(46px, 5vw, 64px)',
                   fontWeight: 700,
                   color,
                   animation: 'cp-pulso 1.5s ease-in-out infinite',
@@ -180,14 +180,14 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
           <div style={{ textAlign: 'center', padding: '12px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }} aria-hidden="true">
               {info.estado === 'acierto' ? (
-                <Target size={64} color="var(--cp-green)" strokeWidth={1.6} />
+                <Target size={80} color="var(--cp-green)" strokeWidth={1.6} />
               ) : info.estado === 'omision' ? (
-                <Hourglass size={64} color="var(--cp-amber)" strokeWidth={1.6} />
+                <Hourglass size={80} color="var(--cp-amber)" strokeWidth={1.6} />
               ) : (
-                <Smile size={64} color="var(--cp-text-2)" strokeWidth={1.6} />
+                <Smile size={80} color="var(--cp-text-2)" strokeWidth={1.6} />
               )}
             </div>
-            <p style={{ fontSize: 19, fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 6 }}>
+            <p style={{ fontSize: 'clamp(19px, 2vw, 25px)', fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 6 }}>
               {info.estado === 'acierto'
                 ? '¡Muy buen cálculo!'
                 : info.estado === 'omision'
@@ -196,7 +196,7 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
                     ? 'Un poquito antes…'
                     : 'Un poquito después…'}
             </p>
-            <p style={{ fontSize: 15, color: 'var(--cp-text-2)', marginBottom: 16 }}>
+            <p style={{ fontSize: 'clamp(15px, 1.6vw, 19px)', color: 'var(--cp-text-2)', marginBottom: 16 }}>
               {info.transcurrido !== null
                 ? `Tocaste a los ${info.transcurrido}s. El objetivo era ${info.objetivo}s.`
                 : `El objetivo era ${info.objetivo}s.`}
@@ -204,7 +204,7 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
 
             {/* Barra de cercanía: zona verde = tolerancia, punto = su toque. */}
             {info.transcurrido !== null && (
-              <div style={{ maxWidth: 340, margin: '0 auto' }}>
+              <div style={{ maxWidth: 460, margin: '0 auto' }}>
                 <div
                   aria-hidden="true"
                   style={{
@@ -244,9 +244,9 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    fontSize: 12,
+                    fontSize: 14,
                     color: 'var(--cp-text-3)',
-                    marginTop: 4,
+                    marginTop: 6,
                   }}
                 >
                   <span>0s</span>

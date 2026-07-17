@@ -89,15 +89,15 @@ export default function CambiaLaRegla({ configuracion, color, onTerminar }) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            fontSize: 14.5,
+            fontSize: 'clamp(14.5px, 1.5vw, 18px)',
             fontWeight: 700,
             color: 'var(--cp-warm)',
             marginBottom: 8,
-            minHeight: 20,
+            minHeight: 24,
             visibility: ronda.cambio ? 'visible' : 'hidden',
           }}
         >
-          <RefreshCw size={16} aria-hidden="true" />
+          <RefreshCw size={20} aria-hidden="true" />
           ¡Cambió la regla!
         </p>
 
@@ -116,7 +116,7 @@ export default function CambiaLaRegla({ configuracion, color, onTerminar }) {
               boxShadow: 'var(--sh-sm)',
             }}
           >
-            <Figura forma={ronda.forma} color={ronda.color} tam="clamp(84px, 10vw, 120px)" />
+            <Figura forma={ronda.forma} color={ronda.color} tam="clamp(96px, 12vw, 180px)" />
           </div>
         </div>
 
@@ -131,9 +131,9 @@ export default function CambiaLaRegla({ configuracion, color, onTerminar }) {
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: 14,
+            gap: 'clamp(14px, 1.6vw, 22px)',
             width: '100%',
-            maxWidth: 520,
+            maxWidth: 720,
             marginInline: 'auto',
           }}
         >
@@ -150,7 +150,7 @@ export default function CambiaLaRegla({ configuracion, color, onTerminar }) {
                 padding: 18,
               })}
             >
-              <Figura forma={op.forma} color={op.color} tam="clamp(64px, 8vw, 92px)" />
+              <Figura forma={op.forma} color={op.color} tam="clamp(72px, 9vw, 140px)" />
             </button>
           ))}
         </div>

@@ -23,8 +23,8 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
         alignItems: 'center',
         textAlign: 'center',
         gap: 18,
-        padding: 'clamp(24px, 5vw, 48px) 16px',
-        maxWidth: 560,
+        padding: 'clamp(24px, 4vw, 44px) 16px',
+        maxWidth: 680,
         margin: '0 auto',
       }}
     >
@@ -34,18 +34,18 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: 104,
-          height: 104,
+          width: 'clamp(104px, 10vw, 136px)',
+          height: 'clamp(104px, 10vw, 136px)',
           borderRadius: '50%',
           background: `color-mix(in srgb, ${color} 12%, white)`,
         }}
       >
-        <IconoMensaje size={56} color={color} strokeWidth={1.6} />
+        <IconoMensaje size={68} color={color} strokeWidth={1.6} />
       </div>
       <div>
         <h2
           style={{
-            fontSize: 'clamp(22px, 4vw, 28px)',
+            fontSize: 'clamp(24px, 3vw, 34px)',
             fontWeight: 700,
             letterSpacing: '-0.02em',
             color: 'var(--cp-text-1)',
@@ -54,7 +54,7 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
         >
           {mensaje.titulo}
         </h2>
-        <p style={{ fontSize: 15, color: 'var(--cp-text-2)' }}>{mensaje.texto}</p>
+        <p style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'var(--cp-text-2)' }}>{mensaje.texto}</p>
       </div>
 
       <div
@@ -64,8 +64,8 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
           alignItems: 'center',
           gap: 12,
           width: '100%',
-          maxWidth: 380,
-          padding: 'clamp(18px, 3vw, 26px)',
+          maxWidth: 460,
+          padding: 'clamp(18px, 3vw, 30px)',
           background: 'var(--cp-surface)',
           border: '1px solid var(--cp-border)',
           borderRadius: 'var(--r-xl)',
@@ -75,7 +75,7 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
           <span
             style={{
-              fontSize: 'clamp(42px, 8vw, 54px)',
+              fontSize: 'clamp(46px, 6vw, 66px)',
               fontWeight: 700,
               color,
               letterSpacing: '-0.04em',
@@ -86,7 +86,7 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
           </span>
           <InsigniaPrecision precision={intento.precision} etiqueta="" />
         </div>
-        <div style={{ fontSize: 13.5, color: 'var(--cp-text-3)' }}>
+        <div style={{ fontSize: 'clamp(13.5px, 1.3vw, 16px)', color: 'var(--cp-text-3)' }}>
           {intento.puntaje} puntos · nivel {intento.nivel}
         </div>
 
@@ -95,7 +95,7 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
         {filas.map((f) => (
           <div
             key={f.etiqueta}
-            style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: 14.5 }}
+            style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: 'clamp(14.5px, 1.4vw, 17px)' }}
           >
             <span style={{ color: 'var(--cp-text-2)' }}>{f.etiqueta}</span>
             <span style={{ fontWeight: 700, color: f.color }}>{f.valor}</span>
@@ -103,19 +103,19 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 380 }}>
+      <div style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 460 }}>
         <button
           type="button"
           onClick={onReintentar}
           style={{
             flex: 1,
-            minHeight: 52,
-            padding: '12px 16px',
+            minHeight: 60,
+            padding: '14px 18px',
             background: color,
             color: 'white',
             border: 'none',
             borderRadius: 'var(--r-md)',
-            fontSize: 15,
+            fontSize: 'clamp(15px, 1.5vw, 18px)',
             fontWeight: 700,
             fontFamily: 'var(--cp-font)',
             cursor: 'pointer',
@@ -128,13 +128,13 @@ export default function PantallaResultado({ intento, color, onReintentar, onSali
           onClick={onSalir}
           style={{
             flex: 1,
-            minHeight: 52,
-            padding: '12px 16px',
+            minHeight: 60,
+            padding: '14px 18px',
             background: 'var(--cp-surface)',
             color: 'var(--cp-text-1)',
             border: '1px solid var(--cp-border)',
             borderRadius: 'var(--r-md)',
-            fontSize: 15,
+            fontSize: 'clamp(15px, 1.5vw, 18px)',
             fontWeight: 600,
             fontFamily: 'var(--cp-font)',
             cursor: 'pointer',

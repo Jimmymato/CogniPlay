@@ -88,8 +88,8 @@ export default function SecuenciasLogicas({ configuracion, nivel, color, onTermi
   }
 
   const celda = {
-    width: 'clamp(58px, 8vw, 96px)',
-    height: 'clamp(58px, 8vw, 96px)',
+    width: 'clamp(64px, 9vw, 150px)',
+    height: 'clamp(64px, 9vw, 150px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -116,8 +116,8 @@ export default function SecuenciasLogicas({ configuracion, nivel, color, onTermi
             justifyContent: 'center',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: 'clamp(8px, 1.5vw, 16px)',
-            marginBottom: 12,
+            gap: 'clamp(8px, 1.5vw, 24px)',
+            marginBottom: 16,
           }}
         >
           {ronda.visibles.map((dibujo, i) => (
@@ -129,7 +129,7 @@ export default function SecuenciasLogicas({ configuracion, nivel, color, onTermi
                 border: '1px solid var(--cp-border)',
               }}
             >
-              <Figura forma={dibujo.forma} color={dibujo.color} tam="clamp(40px, 5.5vw, 68px)" />
+              <Figura forma={dibujo.forma} color={dibujo.color} tam="clamp(46px, 6.5vw, 112px)" />
             </span>
           ))}
           <span
@@ -138,7 +138,7 @@ export default function SecuenciasLogicas({ configuracion, nivel, color, onTermi
               color,
               background: `color-mix(in srgb, ${color} 12%, white)`,
               border: `2px dashed ${color}`,
-              fontSize: 'clamp(30px, 4vw, 44px)',
+              fontSize: 'clamp(34px, 4.5vw, 68px)',
               fontWeight: 700,
             }}
           >
@@ -156,10 +156,10 @@ export default function SecuenciasLogicas({ configuracion, nivel, color, onTermi
           style={{
             display: 'grid',
             gridTemplateColumns: `repeat(${ronda.opciones.length}, 1fr)`,
-            gap: 14,
-            marginTop: 12,
+            gap: 'clamp(14px, 1.6vw, 22px)',
+            marginTop: 14,
             width: '100%',
-            maxWidth: ronda.opciones.length > 3 ? 640 : 520,
+            maxWidth: ronda.opciones.length > 3 ? 900 : 720,
             marginInline: 'auto',
           }}
         >
@@ -176,7 +176,7 @@ export default function SecuenciasLogicas({ configuracion, nivel, color, onTermi
                 padding: 16,
               })}
             >
-              <Figura forma={opcion.forma} color={opcion.color} tam="clamp(46px, 6vw, 72px)" />
+              <Figura forma={opcion.forma} color={opcion.color} tam="clamp(52px, 7vw, 112px)" />
             </button>
           ))}
         </div>

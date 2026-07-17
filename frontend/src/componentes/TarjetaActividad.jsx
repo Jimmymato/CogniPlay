@@ -40,7 +40,7 @@ export default function TarjetaActividad({
         gap: 14,
         width: '100%',
         textAlign: 'left',
-        padding: 20,
+        padding: 'clamp(20px, 1.8vw, 28px)',
         background: 'var(--cp-surface)',
         border: `1px solid ${enfocada && !bloqueada ? colorFuncion : 'var(--cp-border)'}`,
         borderRadius: 'var(--r-lg)',
@@ -61,7 +61,7 @@ export default function TarjetaActividad({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            fontSize: 12,
+            fontSize: 'clamp(12px, 1.1vw, 14px)',
             fontWeight: 700,
             color: colorFuncion,
             background: `color-mix(in srgb, ${colorFuncion} 10%, white)`,
@@ -91,19 +91,19 @@ export default function TarjetaActividad({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 56,
-            height: 56,
+            width: 'clamp(56px, 4.5vw, 72px)',
+            height: 'clamp(56px, 4.5vw, 72px)',
             borderRadius: 'var(--r-md)',
             background: `color-mix(in srgb, ${colorFuncion} 14%, white)`,
             flexShrink: 0,
           }}
         >
-          <IconoActividad nombre={actividad.icono} size={30} color={colorFuncion} />
+          <IconoActividad nombre={actividad.icono} size={38} color={colorFuncion} />
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 17,
+              fontSize: 'clamp(17px, 1.5vw, 21px)',
               fontWeight: 700,
               color: 'var(--cp-text-1)',
               letterSpacing: '-0.01em',
@@ -111,7 +111,7 @@ export default function TarjetaActividad({
           >
             {actividad.nombre}
           </div>
-          <div style={{ fontSize: 13.5, color: 'var(--cp-text-2)', marginTop: 3, lineHeight: 1.4 }}>
+          <div style={{ fontSize: 'clamp(13.5px, 1.2vw, 16px)', color: 'var(--cp-text-2)', marginTop: 3, lineHeight: 1.4 }}>
             {actividad.descripcion}
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function TarjetaActividad({
           <span
             style={{
               marginLeft: 'auto',
-              fontSize: 14,
+              fontSize: 'clamp(14px, 1.3vw, 16.5px)',
               fontWeight: 700,
               color: colorFuncion,
               display: 'inline-flex',

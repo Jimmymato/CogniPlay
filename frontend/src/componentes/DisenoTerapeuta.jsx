@@ -60,7 +60,7 @@ export default function DisenoTerapeuta({ titulo, subtitulo, acciones, children 
           </div>
           {acciones && <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>{acciones}</div>}
         </header>
-        <main style={{ flex: 1, width: '100%', maxWidth: 1240, margin: '0 auto', padding: '24px 28px 44px' }}>
+        <main style={{ flex: 1, width: '100%', maxWidth: 1560, margin: '0 auto', padding: '24px 28px 44px' }}>
           {children}
         </main>
       </div>

@@ -113,7 +113,7 @@ export default function DetalleNino() {
   return (
     <div style={{ minHeight: '100%', background: 'var(--cp-bg)' }}>
       <BarraSuperior />
-      <main style={{ padding: '20px 20px 40px', maxWidth: 1100, margin: '0 auto' }}>
+      <main style={{ padding: '20px 20px 40px', maxWidth: 1400, margin: '0 auto' }}>
         <button
           type="button"
           onClick={() => navegar(RUTAS.terapeuta)}

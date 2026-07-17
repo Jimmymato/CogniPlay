@@ -143,7 +143,7 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            height: 'clamp(200px, 32vh, 300px)',
+            height: 'clamp(220px, 36vh, 400px)',
             marginBottom: 20,
           }}
           aria-live="polite"
@@ -151,15 +151,15 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
           {fase === 'preparacion' && (
             <div
               style={{
-                width: 'clamp(150px, 20vw, 200px)',
-                height: 'clamp(150px, 20vw, 200px)',
+                width: 'clamp(160px, 20vw, 280px)',
+                height: 'clamp(160px, 20vw, 280px)',
                 borderRadius: '50%',
                 background: 'var(--cp-surface-2)',
                 border: '3px dashed var(--cp-border-mid)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 20,
+                fontSize: 'clamp(20px, 2vw, 26px)',
                 fontWeight: 700,
                 color: 'var(--cp-text-3)',
                 fontFamily: 'var(--cp-font)',
@@ -172,8 +172,8 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
           {fase === 'senal' && tipo === 'go' && (
             <div
               style={{
-                width: 'clamp(160px, 22vw, 220px)',
-                height: 'clamp(160px, 22vw, 220px)',
+                width: 'clamp(170px, 24vw, 320px)',
+                height: 'clamp(170px, 24vw, 320px)',
                 borderRadius: '50%',
                 background: VERDE,
                 display: 'flex',
@@ -185,16 +185,16 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
                 boxShadow: 'var(--sh-md)',
               }}
             >
-              <Check size={72} strokeWidth={3} aria-hidden="true" />
-              <span style={{ fontSize: 20, fontWeight: 700 }}>¡Verde!</span>
+              <Check size={96} strokeWidth={3} aria-hidden="true" />
+              <span style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', fontWeight: 700 }}>¡Verde!</span>
             </div>
           )}
 
           {fase === 'senal' && tipo === 'nogo' && (
             <div
               style={{
-                width: 'clamp(165px, 22vw, 225px)',
-                height: 'clamp(165px, 22vw, 225px)',
+                width: 'clamp(175px, 24vw, 330px)',
+                height: 'clamp(175px, 24vw, 330px)',
                 background: ROJO,
                 clipPath:
                   'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
@@ -206,8 +206,8 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
                 color: 'white',
               }}
             >
-              <Hand size={64} strokeWidth={2.2} aria-hidden="true" />
-              <span style={{ fontSize: 20, fontWeight: 700 }}>¡Alto!</span>
+              <Hand size={84} strokeWidth={2.2} aria-hidden="true" />
+              <span style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', fontWeight: 700 }}>¡Alto!</span>
             </div>
           )}
 
@@ -216,8 +216,8 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
             const Icono = m.icono
             return (
               <div style={{ textAlign: 'center' }}>
-                <Icono size={72} strokeWidth={2.4} color={m.color} aria-hidden="true" />
-                <p style={{ fontSize: 19, fontWeight: 700, color: 'var(--cp-text-1)', marginTop: 6 }}>
+                <Icono size={96} strokeWidth={2.4} color={m.color} aria-hidden="true" />
+                <p style={{ fontSize: 'clamp(19px, 2vw, 24px)', fontWeight: 700, color: 'var(--cp-text-1)', marginTop: 6 }}>
                   {m.texto}
                 </p>
               </div>
@@ -233,13 +233,13 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
             disabled={!botonActivo}
             aria-label="Tocar"
             style={{
-              minWidth: 'min(320px, 80%)',
-              minHeight: 80,
+              minWidth: 'min(420px, 80%)',
+              minHeight: 'clamp(80px, 10vh, 104px)',
               borderRadius: 'var(--r-pill)',
               border: 'none',
               background: AZUL_BOTON,
               color: 'white',
-              fontSize: 24,
+              fontSize: 'clamp(24px, 2.4vw, 32px)',
               fontWeight: 700,
               fontFamily: 'var(--cp-font)',
               cursor: botonActivo ? 'pointer' : 'default',
