@@ -127,8 +127,8 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
 
   function estiloCelda(extra) {
     return {
-      width: 'clamp(58px, 9vw, 72px)',
-      height: 'clamp(58px, 9vw, 72px)',
+      width: 'clamp(64px, 9vw, 96px)',
+      height: 'clamp(64px, 9vw, 96px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -186,7 +186,7 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                       : {},
                   )}
                 >
-                  <icono.Icono size={34} color={icono.color} aria-hidden="true" />
+                  <icono.Icono size={44} color={icono.color} aria-hidden="true" />
                 </div>
               ))}
             </div>
@@ -225,8 +225,8 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                     disabled={reventado}
                     aria-label={reventado ? 'Globo reventado' : 'Reventar globo'}
                     style={{
-                      width: 74,
-                      height: 86,
+                      width: 90,
+                      height: 106,
                       border: 'none',
                       background: 'transparent',
                       cursor: reventado ? 'default' : 'pointer',
@@ -236,8 +236,8 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                     <span
                       style={{
                         display: 'block',
-                        width: 64,
-                        height: 76,
+                        width: 78,
+                        height: 94,
                         margin: '0 auto',
                         borderRadius: '50% 50% 46% 46%',
                         background: reventado
@@ -303,7 +303,7 @@ export default function RetomaLaTarea({ configuracion, nivel, color, onTerminar 
                       transition: 'background 0.2s ease, border-color 0.2s ease',
                     })}
                   >
-                    <icono.Icono size={34} color={icono.color} aria-hidden="true" />
+                    <icono.Icono size={44} color={icono.color} aria-hidden="true" />
                   </button>
                 )
               })}

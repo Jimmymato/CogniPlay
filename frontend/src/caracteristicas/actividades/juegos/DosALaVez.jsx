@@ -97,17 +97,17 @@ function Ventana({ titulo, colorMarco, contenido }) {
       </div>
       <div
         style={{
-          minHeight: 110,
+          minHeight: 'clamp(110px, 16vh, 150px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 14,
-          padding: 14,
+          gap: 18,
+          padding: 16,
           flexWrap: 'wrap',
         }}
       >
         {contenido.map((objeto, i) => (
-          <Objeto key={`${objeto.id}${i}`} objeto={objeto} tam={44} />
+          <Objeto key={`${objeto.id}${i}`} objeto={objeto} tam={56} />
         ))}
       </div>
     </div>
@@ -167,10 +167,10 @@ export default function DosALaVez({ configuracion, nivel, color, onTerminar }) {
       <div style={estiloZonaJuego}>
         <p style={{ ...estiloInstruccion, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
           ¿Está
-          <Objeto objeto={objetivoIzq} tam={26} />
+          <Objeto objeto={objetivoIzq} tam={32} />
           en la <strong>ventana azul</strong>
           <span aria-hidden="true">y</span>
-          <Objeto objeto={objetivoDer} tam={26} />
+          <Objeto objeto={objetivoDer} tam={32} />
           en la <strong>ventana amarilla</strong>?
         </p>
 
@@ -180,7 +180,7 @@ export default function DosALaVez({ configuracion, nivel, color, onTerminar }) {
             display: 'flex',
             gap: 'clamp(10px, 2vw, 20px)',
             width: '100%',
-            maxWidth: 640,
+            maxWidth: 780,
             marginInline: 'auto',
             marginBottom: 18,
           }}
@@ -216,7 +216,7 @@ export default function DosALaVez({ configuracion, nivel, color, onTerminar }) {
               onClick={() => responder(b.clave)}
               disabled={bloqueado}
               style={estiloOpcion(estadoBoton(b.clave), bloqueado, {
-                fontSize: 21,
+                fontSize: 24,
                 fontWeight: 700,
                 color: 'var(--cp-text-1)',
               })}

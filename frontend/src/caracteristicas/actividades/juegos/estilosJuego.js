@@ -22,7 +22,7 @@ export const estiloZonaJuego = {
 // Instrucción principal del juego: grande y clara.
 export const estiloInstruccion = {
   textAlign: 'center',
-  fontSize: 'clamp(16px, 2.4vw, 19px)',
+  fontSize: 'clamp(17px, 2.2vw, 24px)',
   lineHeight: 1.45,
   color: 'var(--cp-text-1)',
   marginBottom: 18,
@@ -31,7 +31,7 @@ export const estiloInstruccion = {
 // Texto de pista (solo en nivel Fácil).
 export const estiloPista = {
   textAlign: 'center',
-  fontSize: 14,
+  fontSize: 'clamp(14px, 1.6vw, 17px)',
   color: 'var(--cp-text-3)',
   marginBottom: 14,
 }
@@ -51,8 +51,8 @@ export function coloresOpcion(estado) {
 export function estiloOpcion(estado, bloqueado, extra = {}) {
   const { borde, fondo } = coloresOpcion(estado)
   return {
-    minHeight: 62,
-    padding: '14px 18px',
+    minHeight: 'clamp(62px, 8vh, 80px)',
+    padding: '16px 22px',
     background: fondo,
     border: `2px solid ${borde}`,
     borderRadius: 'var(--r-lg)',
@@ -67,13 +67,13 @@ export function estiloOpcion(estado, bloqueado, extra = {}) {
 // Botón principal de acción (continuar, empezar, etc.).
 export function estiloBotonPrincipal(color, extra = {}) {
   return {
-    minHeight: 56,
-    padding: '14px 30px',
+    minHeight: 64,
+    padding: '16px 36px',
     background: color,
     color: 'white',
     border: 'none',
     borderRadius: 'var(--r-lg)',
-    fontSize: 17,
+    fontSize: 'clamp(17px, 1.8vw, 20px)',
     fontWeight: 700,
     fontFamily: 'var(--cp-font)',
     cursor: 'pointer',

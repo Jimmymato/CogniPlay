@@ -132,7 +132,7 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
             flexDirection: 'column',
             gap: 14,
             width: '100%',
-            maxWidth: 620,
+            maxWidth: 760,
             marginInline: 'auto',
           }}
         >
@@ -152,7 +152,7 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
                   width: '100%',
                 })}
               >
-                <Rabbit size={30} color="var(--cp-text-2)" aria-hidden="true" style={{ flexShrink: 0 }} />
+                <Rabbit size={38} color="var(--cp-text-2)" aria-hidden="true" style={{ flexShrink: 0 }} />
                 <Tramo />
                 <span
                   style={{
@@ -165,15 +165,15 @@ export default function MejorCamino({ configuracion, nivel, color, onTerminar })
                   aria-hidden="true"
                 >
                   {Array.from({ length: camino.estrellas }, (_, i) => (
-                    <Star key={`e${i}`} size={24} color="var(--cp-amber)" fill="var(--cp-amber)" />
+                    <Star key={`e${i}`} size={30} color="var(--cp-amber)" fill="var(--cp-amber)" />
                   ))}
                   {Array.from({ length: camino.conos }, (_, i) => (
-                    <TrafficCone key={`c${i}`} size={24} color="#C06515" />
+                    <TrafficCone key={`c${i}`} size={30} color="#C06515" />
                   ))}
                 </span>
                 <Tramo />
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  <Carrot size={30} color="#C06515" aria-hidden="true" />
+                  <Carrot size={38} color="#C06515" aria-hidden="true" />
                   {pistas && (
                     <span
                       style={{

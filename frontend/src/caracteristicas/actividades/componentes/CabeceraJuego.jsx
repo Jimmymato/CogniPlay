@@ -24,10 +24,10 @@ export default function CabeceraJuego({
           marginBottom: 8,
         }}
       >
-        <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--cp-text-1)' }}>
+        <span style={{ fontSize: 'clamp(16px, 1.6vw, 19px)', fontWeight: 700, color: 'var(--cp-text-1)' }}>
           {titulo}
         </span>
-        <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--cp-text-2)' }}>
+        <span style={{ fontSize: 'clamp(13.5px, 1.4vw, 15.5px)', fontWeight: 600, color: 'var(--cp-text-2)' }}>
           Ítem {Math.min(indice + 1, total)} de {total}
         </span>
       </div>

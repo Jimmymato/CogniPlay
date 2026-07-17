@@ -116,7 +116,7 @@ export default function CambiaLaRegla({ configuracion, color, onTerminar }) {
               boxShadow: 'var(--sh-sm)',
             }}
           >
-            <Figura forma={ronda.forma} color={ronda.color} tam={76} />
+            <Figura forma={ronda.forma} color={ronda.color} tam="clamp(84px, 10vw, 120px)" />
           </div>
         </div>
 
@@ -133,7 +133,7 @@ export default function CambiaLaRegla({ configuracion, color, onTerminar }) {
             gridTemplateColumns: '1fr 1fr',
             gap: 14,
             width: '100%',
-            maxWidth: 420,
+            maxWidth: 520,
             marginInline: 'auto',
           }}
         >
@@ -150,7 +150,7 @@ export default function CambiaLaRegla({ configuracion, color, onTerminar }) {
                 padding: 18,
               })}
             >
-              <Figura forma={op.forma} color={op.color} tam={60} />
+              <Figura forma={op.forma} color={op.color} tam="clamp(64px, 8vw, 92px)" />
             </button>
           ))}
         </div>

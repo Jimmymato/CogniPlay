@@ -92,7 +92,7 @@ export default function PantallaActividad() {
       <main
         style={{
           padding: 'clamp(16px, 3vw, 28px) clamp(16px, 4vw, 40px) 48px',
-          maxWidth: 1080,
+          maxWidth: 1280,
           margin: '0 auto',
         }}
       >
@@ -260,7 +260,7 @@ export default function PantallaActividad() {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                minHeight: 'min(64vh, 600px)',
+                minHeight: 'min(76vh, 780px)',
                 padding: 'clamp(18px, 3.5vw, 40px)',
                 background: 'var(--cp-surface)',
                 border: '1px solid var(--cp-border)',

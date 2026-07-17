@@ -143,7 +143,7 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            height: 'clamp(180px, 30vh, 230px)',
+            height: 'clamp(200px, 32vh, 300px)',
             marginBottom: 20,
           }}
           aria-live="polite"
@@ -151,15 +151,15 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
           {fase === 'preparacion' && (
             <div
               style={{
-                width: 150,
-                height: 150,
+                width: 'clamp(150px, 20vw, 200px)',
+                height: 'clamp(150px, 20vw, 200px)',
                 borderRadius: '50%',
                 background: 'var(--cp-surface-2)',
                 border: '3px dashed var(--cp-border-mid)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: 700,
                 color: 'var(--cp-text-3)',
                 fontFamily: 'var(--cp-font)',
@@ -172,8 +172,8 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
           {fase === 'senal' && tipo === 'go' && (
             <div
               style={{
-                width: 160,
-                height: 160,
+                width: 'clamp(160px, 22vw, 220px)',
+                height: 'clamp(160px, 22vw, 220px)',
                 borderRadius: '50%',
                 background: VERDE,
                 display: 'flex',
@@ -185,16 +185,16 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
                 boxShadow: 'var(--sh-md)',
               }}
             >
-              <Check size={62} strokeWidth={3} aria-hidden="true" />
-              <span style={{ fontSize: 18, fontWeight: 700 }}>¡Verde!</span>
+              <Check size={72} strokeWidth={3} aria-hidden="true" />
+              <span style={{ fontSize: 20, fontWeight: 700 }}>¡Verde!</span>
             </div>
           )}
 
           {fase === 'senal' && tipo === 'nogo' && (
             <div
               style={{
-                width: 165,
-                height: 165,
+                width: 'clamp(165px, 22vw, 225px)',
+                height: 'clamp(165px, 22vw, 225px)',
                 background: ROJO,
                 clipPath:
                   'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
@@ -206,8 +206,8 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
                 color: 'white',
               }}
             >
-              <Hand size={56} strokeWidth={2.2} aria-hidden="true" />
-              <span style={{ fontSize: 18, fontWeight: 700 }}>¡Alto!</span>
+              <Hand size={64} strokeWidth={2.2} aria-hidden="true" />
+              <span style={{ fontSize: 20, fontWeight: 700 }}>¡Alto!</span>
             </div>
           )}
 
@@ -216,8 +216,8 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
             const Icono = m.icono
             return (
               <div style={{ textAlign: 'center' }}>
-                <Icono size={64} strokeWidth={2.4} color={m.color} aria-hidden="true" />
-                <p style={{ fontSize: 17, fontWeight: 700, color: 'var(--cp-text-1)', marginTop: 6 }}>
+                <Icono size={72} strokeWidth={2.4} color={m.color} aria-hidden="true" />
+                <p style={{ fontSize: 19, fontWeight: 700, color: 'var(--cp-text-1)', marginTop: 6 }}>
                   {m.texto}
                 </p>
               </div>
@@ -233,13 +233,13 @@ export default function EsperaLaSenal({ configuracion, nivel, color, onTerminar 
             disabled={!botonActivo}
             aria-label="Tocar"
             style={{
-              minWidth: 'min(280px, 80%)',
-              minHeight: 70,
+              minWidth: 'min(320px, 80%)',
+              minHeight: 80,
               borderRadius: 'var(--r-pill)',
               border: 'none',
               background: AZUL_BOTON,
               color: 'white',
-              fontSize: 22,
+              fontSize: 24,
               fontWeight: 700,
               fontFamily: 'var(--cp-font)',
               cursor: botonActivo ? 'pointer' : 'default',

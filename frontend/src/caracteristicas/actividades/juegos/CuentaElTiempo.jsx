@@ -124,7 +124,7 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
             <p style={estiloInstruccion}>Cuando toques el botón, cuenta en tu mente</p>
             <p
               style={{
-                fontSize: 'clamp(38px, 7vw, 52px)',
+                fontSize: 'clamp(42px, 6vw, 64px)',
                 fontWeight: 700,
                 color,
                 textAlign: 'center',
@@ -150,15 +150,15 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
               <div
                 aria-hidden="true"
                 style={{
-                  width: 140,
-                  height: 140,
+                  width: 'clamp(150px, 18vw, 190px)',
+                  height: 'clamp(150px, 18vw, 190px)',
                   borderRadius: '50%',
                   background: `color-mix(in srgb, ${color} 14%, white)`,
                   border: `3px solid ${color}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 40,
+                  fontSize: 46,
                   fontWeight: 700,
                   color,
                   animation: 'cp-pulso 1.5s ease-in-out infinite',
@@ -180,11 +180,11 @@ export default function CuentaElTiempo({ configuracion, nivel, color, onTerminar
           <div style={{ textAlign: 'center', padding: '12px 0' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }} aria-hidden="true">
               {info.estado === 'acierto' ? (
-                <Target size={54} color="var(--cp-green)" strokeWidth={1.6} />
+                <Target size={64} color="var(--cp-green)" strokeWidth={1.6} />
               ) : info.estado === 'omision' ? (
-                <Hourglass size={54} color="var(--cp-amber)" strokeWidth={1.6} />
+                <Hourglass size={64} color="var(--cp-amber)" strokeWidth={1.6} />
               ) : (
-                <Smile size={54} color="var(--cp-text-2)" strokeWidth={1.6} />
+                <Smile size={64} color="var(--cp-text-2)" strokeWidth={1.6} />
               )}
             </div>
             <p style={{ fontSize: 19, fontWeight: 700, color: 'var(--cp-text-1)', marginBottom: 6 }}>

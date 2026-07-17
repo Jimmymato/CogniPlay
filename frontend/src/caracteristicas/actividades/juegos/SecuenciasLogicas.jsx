@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import CabeceraJuego from '../componentes/CabeceraJuego'
+import Figura from '../componentes/Figura'
 import { useJuegoRondas } from './useJuegoRondas'
-import { entero, barajar } from './aleatorio'
+import { elementoAleatorio, barajar } from './aleatorio'
 import {
   estiloJuegoRaiz,
   estiloZonaJuego,
@@ -10,27 +11,59 @@ import {
   estiloOpcion,
 } from './estilosJuego'
 
-// Crea una ronda: una secuencia aritmética visible con el último término oculto
-// y cuatro opciones (la correcta y tres distractores cercanos).
-function crearRonda() {
-  const inicio = entero(1, 9)
-  const paso = entero(1, 5)
-  const visibles = [0, 1, 2, 3].map((i) => inicio + paso * i)
-  const respuesta = inicio + paso * 4
-
-  const opciones = new Set([respuesta])
-  while (opciones.size < 4) {
-    const desvio = entero(-3, 3)
-    const candidato = respuesta + (desvio === 0 ? paso + 1 : desvio)
-    if (candidato > 0) opciones.add(candidato)
-  }
-
-  return { visibles, respuesta, paso, opciones: barajar([...opciones]) }
+// Secuencias visuales de patrones: cada letra del patrón es un dibujo (forma +
+// color) y la fila repite el patrón; el niño elige el dibujo que sigue. Es
+// razonamiento sin aritmética, apropiado para el público del sistema.
+const PATRONES = {
+  FACIL: ['AB'],
+  MEDIO: ['ABC'],
+  DIFICIL: ['AAB', 'ABB', 'ABC'],
 }
 
-export default function SecuenciasLogicas({ configuracion, color, onTerminar }) {
+const FORMAS = ['circulo', 'cuadrado', 'triangulo']
+// Colores apagados (público TEA), pero bien distinguibles entre sí.
+const COLORES = ['#C05A52', '#2F72CE', '#3E9668', '#D49A14']
+
+// Cantidad de dibujos visibles antes del hueco: alcanza para ver el patrón
+// repetirse al menos dos veces con cualquiera de los patrones definidos.
+const VISIBLES = 5
+
+// Crea una ronda: asigna un dibujo distinto a cada letra del patrón, arma los
+// cinco visibles, la respuesta (el que sigue) y las opciones con un distractor
+// que no pertenece al patrón.
+function crearRonda(nivel) {
+  const patron = elementoAleatorio(PATRONES[nivel] ?? PATRONES.FACIL)
+  const letras = [...new Set(patron)]
+  const formas = barajar(FORMAS)
+  const colores = barajar(COLORES)
+
+  const porLetra = {}
+  letras.forEach((letra, i) => {
+    porLetra[letra] = { forma: formas[i], color: colores[i], clave: `${formas[i]}|${colores[i]}` }
+  })
+
+  const dibujoEn = (i) => porLetra[patron[i % patron.length]]
+  const visibles = Array.from({ length: VISIBLES }, (_, i) => dibujoEn(i))
+  const respuesta = dibujoEn(VISIBLES)
+
+  // Distractor con forma o color aún sin usar, para que nunca se confunda con
+  // los dibujos del patrón.
+  const n = letras.length
+  const distractor =
+    n < FORMAS.length
+      ? { forma: formas[n], color: colores[n], clave: `${formas[n]}|${colores[n]}` }
+      : { forma: formas[0], color: colores[n], clave: `${formas[0]}|${colores[n]}` }
+
+  const opciones = barajar([...letras.map((l) => porLetra[l]), distractor])
+  return { visibles, respuesta, opciones }
+}
+
+export default function SecuenciasLogicas({ configuracion, nivel, color, onTerminar }) {
   const { items, tiempoLimiteSegundos, pistas } = configuracion
-  const rondas = useMemo(() => Array.from({ length: items }, crearRonda), [items])
+  const rondas = useMemo(
+    () => Array.from({ length: items }, () => crearRonda(nivel)),
+    [items, nivel],
+  )
   const [elegida, setElegida] = useState(null)
 
   const { indice, restante, bloqueado, registrar } = useJuegoRondas({
@@ -43,25 +76,23 @@ export default function SecuenciasLogicas({ configuracion, color, onTerminar }) 
 
   function responder(opcion) {
     if (bloqueado) return
-    setElegida(opcion)
-    registrar(opcion === ronda.respuesta, () => setElegida(null))
+    setElegida(opcion.clave)
+    registrar(opcion.clave === ronda.respuesta.clave, () => setElegida(null))
   }
 
   function estadoOpcion(opcion) {
     if (elegida === null) return null
-    if (opcion === ronda.respuesta) return 'correcta'
-    if (opcion === elegida) return 'incorrecta'
+    if (opcion.clave === ronda.respuesta.clave) return 'correcta'
+    if (opcion.clave === elegida) return 'incorrecta'
     return null
   }
 
   const celda = {
-    minWidth: 'clamp(54px, 8vw, 68px)',
-    height: 'clamp(54px, 8vw, 68px)',
+    width: 'clamp(58px, 8vw, 96px)',
+    height: 'clamp(58px, 8vw, 96px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 'clamp(22px, 3.4vw, 28px)',
-    fontWeight: 700,
     borderRadius: 'var(--r-md)',
   }
 
@@ -77,7 +108,7 @@ export default function SecuenciasLogicas({ configuracion, color, onTerminar }) 
       />
 
       <div style={estiloZonaJuego}>
-        <p style={estiloInstruccion}>¿Qué número sigue en la secuencia?</p>
+        <p style={estiloInstruccion}>¿Qué dibujo sigue en la secuencia?</p>
 
         <div
           style={{
@@ -85,21 +116,20 @@ export default function SecuenciasLogicas({ configuracion, color, onTerminar }) 
             justifyContent: 'center',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: 'clamp(8px, 1.5vw, 14px)',
-            marginBottom: 10,
+            gap: 'clamp(8px, 1.5vw, 16px)',
+            marginBottom: 12,
           }}
         >
-          {ronda.visibles.map((n, i) => (
+          {ronda.visibles.map((dibujo, i) => (
             <span
               key={i}
               style={{
                 ...celda,
-                color: 'var(--cp-text-1)',
                 background: 'var(--cp-surface)',
                 border: '1px solid var(--cp-border)',
               }}
             >
-              {n}
+              <Figura forma={dibujo.forma} color={dibujo.color} tam="clamp(40px, 5.5vw, 68px)" />
             </span>
           ))}
           <span
@@ -108,6 +138,8 @@ export default function SecuenciasLogicas({ configuracion, color, onTerminar }) 
               color,
               background: `color-mix(in srgb, ${color} 12%, white)`,
               border: `2px dashed ${color}`,
+              fontSize: 'clamp(30px, 4vw, 44px)',
+              fontWeight: 700,
             }}
           >
             ?
@@ -116,34 +148,35 @@ export default function SecuenciasLogicas({ configuracion, color, onTerminar }) 
 
         {pistas && (
           <p style={estiloPista}>
-            Pista: cada número aumenta de {ronda.paso} en {ronda.paso}.
+            Pista: los dibujos se repiten siempre en el mismo orden. Mira cómo empieza.
           </p>
         )}
 
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: `repeat(${ronda.opciones.length}, 1fr)`,
             gap: 14,
-            marginTop: 10,
+            marginTop: 12,
             width: '100%',
-            maxWidth: 460,
+            maxWidth: ronda.opciones.length > 3 ? 640 : 520,
             marginInline: 'auto',
           }}
         >
-          {ronda.opciones.map((opcion) => (
+          {ronda.opciones.map((opcion, i) => (
             <button
-              key={opcion}
+              key={opcion.clave}
               type="button"
               onClick={() => responder(opcion)}
               disabled={bloqueado}
+              aria-label={`Opción ${i + 1}: ${opcion.forma}`}
               style={estiloOpcion(estadoOpcion(opcion), bloqueado, {
-                fontSize: 24,
-                fontWeight: 700,
-                color: 'var(--cp-text-1)',
+                display: 'flex',
+                justifyContent: 'center',
+                padding: 16,
               })}
             >
-              {opcion}
+              <Figura forma={opcion.forma} color={opcion.color} tam="clamp(46px, 6vw, 72px)" />
             </button>
           ))}
         </div>
