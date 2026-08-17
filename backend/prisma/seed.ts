@@ -156,7 +156,7 @@ async function sembrarUsuariosPrueba() {
       correo: 'terapeuta@test.com',
       contrasenaHash: hash,
       rol: RolUsuario.TERAPEUTA,
-      terapeuta: { create: { nombres: 'Ana', apellidos: 'García' } },
+      terapeuta: { create: { nombres: 'Alex', apellidos: 'Zambrano' } },
     },
     include: { terapeuta: true },
   })
