@@ -176,9 +176,9 @@ export default function PantallaActividad() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'flex-start',
-                    gap: 6,
-                    padding: '24px 22px',
-                    minHeight: 130,
+                    gap: 8,
+                    padding: 'clamp(22px, 2.6vh, 30px) clamp(22px, 2vw, 28px)',
+                    minHeight: 'clamp(170px, 22vh, 220px)',
                     background: 'var(--cp-surface)',
                     border: '1px solid var(--cp-border)',
                     borderRadius: 'var(--r-lg)',
@@ -188,13 +188,21 @@ export default function PantallaActividad() {
                     boxShadow: 'var(--sh-sm)',
                   }}
                 >
-                  <span style={{ fontSize: 'clamp(18px, 1.8vw, 22px)', fontWeight: 700, color: 'var(--cp-text-1)' }}>
+                  <span style={{ fontSize: 'clamp(22px, 2.4vw, 30px)', fontWeight: 700, color: 'var(--cp-text-1)' }}>
                     {ETIQUETA_NIVEL[n.nivel] ?? n.nivel}
                   </span>
-                  <span style={{ fontSize: 'clamp(13px, 1.3vw, 16px)', color: 'var(--cp-text-2)' }}>
+                  <span style={{ fontSize: 'clamp(14px, 1.5vw, 18px)', color: 'var(--cp-text-2)' }}>
                     {DESCRIPCION_NIVEL[n.nivel] ?? ''}
                   </span>
-                  <span style={{ fontSize: 'clamp(12.5px, 1.2vw, 15px)', fontWeight: 600, color: 'var(--cp-text-3)' }}>
+                  {/* El dato de ítems y tiempo se ancla abajo para aprovechar el alto de la tarjeta. */}
+                  <span
+                    style={{
+                      marginTop: 'auto',
+                      fontSize: 'clamp(13px, 1.3vw, 16px)',
+                      fontWeight: 600,
+                      color: 'var(--cp-text-3)',
+                    }}
+                  >
                     {n.configuracion.items} ítems · {n.configuracion.tiempoLimiteSegundos}s
                   </span>
                 </button>
